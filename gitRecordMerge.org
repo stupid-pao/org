@@ -1,0 +1,14 @@
+#+TITLE: Git Record Merge
+
+* feature/myobChanges_992  			dev: ✅
+myob 导出改动
+* feature/merchandise_translate_1021
+- [Enrichment] 翻译 [Mentalmatics] 路径：Resource Management - Merchandise Management(翻译上一页 下一页)
+- dev: ✅
+* feature/enrichmentFinanceAddRefundList_974
+- dev: ✅
+* feature/studentAttendanceAddRemarks_994 
+** dev: ✅
+** 机构 Student Attendance 模块中，在 Remarks 栏和 Action 栏中间加入新的一栏，叫做 Additional Remarks， 可以进行修改
+** 更新 使用js + form 模版 + ajax 通信  重定向url  location.search
+
