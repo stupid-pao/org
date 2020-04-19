@@ -1,0 +1,119 @@
+#+TITLE: Html
+
+* HTML 常用标签
+** 文本格式化标签
+*** 加粗
+#+BEGIN_SRC html
+<strong></strong> 或者 <b></b>
+
+#+END_SRC
+*** 倾斜
+#+BEGIN_SRC html
+<em></em> 或者 <i></i>
+
+#+END_SRC
+*** 删除线
+#+BEGIN_SRC html
+<del></del> 或者 <s></s>
+
+#+END_SRC
+*** 下划线
+#+BEGIN_SRC html
+<ins></ins> 或者 <u></u>
+
+#+END_SRC
+*** 表格
+#+BEGIN_SRC html
+<table>
+  <thead>
+    <tr>
+        <th>表头</th>
+        <th>表头</th>
+        <th>表头</th>
+        <th>表头</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>内容</td><td>内容</td><td>内容</td></tr>
+    <tr><td>内容</td><td>内容</td><td>内容</td></tr>
+  </tbody>
+  
+</table>
+
+#+END_SRC
++ 含义
+    table 定义 表格
+    tr 表格的一行
+    td 表格里的一列
+    th 表示是表头 会加粗居中
++ 属性
+  这些属性要写到 table 标签里面
+  | 属性         | 属性值              | 描述                       |
+  |--------------+---------------------+----------------------------|
+  | align        | left, center, right | 规定表格周围元素的对齐方式 |
+  | border       | 1 或 “”             | 是否有边框，默认“” 无边    |
+  | cellpadding  | 像素值              | 文字和边框的具体           |
+  | cellspadding | 像素值              | 单元格和单元格的距离       |
+  | width        | 像素值或 百分比     | 规定表格的宽度             |
++ 合并单元格
+  + 1
+    跨行合并: rowspan= "num"
+    跨列合并: colspan= "num"
+  + 2
+    目标单元格：
+     跨行：最上侧为目标单元格
+     跨列：最左侧为目标单元格
+  + 3
+    删除多余单元格
+*** 列表标签 
+**** 无序列表 （重要）
+#+BEGIN_SRC html
+<ul>
+  <li>内容</li>
+  <li></li>
+  <li></li>
+</ul>
+
+#+END_SRC
++ 注意⚠️
+  1. ul 中只能嵌套 li 标签， 直接在 ul 中输入其他标签或者文字的做法是不被允许的
+  2. li 相当于一个容器，可以容纳所有元素
+     
+**** 有序列表
+#+BEGIN_SRC html
+<ol>
+  <li>内容</li>
+  <li></li>
+  <li></li>
+</ol>
+
+#+END_SRC
+**** 自定义列表 （重要）
+#+BEGIN_SRC html
+<dl>
+  <dt>名词1</dt>
+  <dd>名词1 解释1</dd>
+  <dd>名词1 解释2</dd>
+</dl>
+#+END_SRC
+*** 表单标签
+表单域 -- 一个包含表单元素的区域
+在 html 标签中，<form> 标签用于定义表单域，以实现用户信息的手机和传递
+<form> 会把它范围内的表单元素信息提交给服务器
+
+#+BEGIN_SRC html
+<form action="url 地址" method= "提交方式" name= "表单域名称">
+  各种表单元素控件
+</form>
+
+#+END_SRC
+**** 表单控件（表单元素）
+***** <input> 输入元素
+#+BEGIN_SRC html
+<input type= "属性值" />
+
+#+END_SRC
++ <input /> 标签为单标签
++ type 设置不用的属性值,用来指定不同的控件类型
+  
+

@@ -3,3 +3,15 @@
 + finish [[file:test.org::nihao][hello]]
 + this bro's [[https://github.com/zaiste/.doom.d/blob/master/config.el][config]].
 + Learn more from [[https://www.youtube.com/watch?v=BRqjaN4-gGQ][Org mode]].
+
+* learn go
+** learn go with test
+** go datastructure
+* learn algorithm
+** [[https://github.com/labuladong/fucking-algorithm][fucking_algorithm]]
+* learn html + css
+* learn javascript
+* learn react
+
+* learn SQL
+** [[https://sqlzoo.net/wiki/SQL_Tutorial][SQL Tutorial]]

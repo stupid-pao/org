@@ -1,14 +1,236 @@
 #+TITLE: Git Record Merge
+🚀 🥎 🎾 🪀 🥏 🥊 🎯 🦠 🌈️
+* music 
+** [[https://www.youtube.com/watch?v=zvkHSDO5VQ8][七里香]] 
+* 🌈️ code snipets
+** upload picture use base64
+#+BEGIN_SRC python
+import base64
+from django.core.files.base import ContentFile
+from enrichment.models import KlassSchedule
 
+klass_schedule = KlassSchedule()
+covers = cover.split(',')
+content_name = covers[0].split(';')[0]
+cover_name = 'cover.{}'.format(content_name.split('/')[-1])
+cover_file = ContentFile(base64.b64decode(covers[1]))
+klass_schedule.cover.save(cover_name, cover_file, False)
+
+#+END_SRC
+
+** export csv
+#+BEGIN_SRC python
+
+url(r'^withdrawn/xls/$', withdrawn_xls, name='withdrawn-xls'),
+
+@login_required
+def withdrawn_xls(request):
+    today = get_current_date()
+    date_from = try_get_date(request.GET, 'date_from', '%d-%m-%Y', get_start_of_month(today))
+    date_to = try_get_date(request.GET, 'date_to', '%d-%m-%Y', get_end_of_month(today))
+    enrichment_center = get_center_for_user(request.user)
+    students = Student.objects.filter(leave_date__isnull=False, enrichment_center=enrichment_center,
+                                      leave_date__range=(date_from, date_to)).order_by('-leave_date').distinct()
+    csv_data = []
+    title_list = [
+        'ID',
+        'Child Name',
+        'Gender',
+        'Date Of Birth',
+        'Emergency Contact',
+        'Emergency Contact No.',
+        'Source',
+        'Class',
+        'Left / Total',
+        'Status',
+        'Withdrawn Date',
+    ]
+
+    today = get_current_date()
+    csv_data.append(title_list)
+    for student in students:
+        student_status = ''
+        if student.leave_date and student.leave_date < today:
+            student_status = _('Withdrawn')
+        elif student.leave_date and student.leave_date >= today:
+            student_status = _('Pre-withdrawn')
+        student_id = student.pk
+        student_name = student.fullname
+        gender = student.get_gender_display()
+        birth = student.date_of_birth.__format__('%d-%m-%Y')
+        contact = student.emergency_contact
+        contact_no = student.emergency_contact_no
+        source = student.get_source_display()
+        cls = student.get_klassschedules_name()
+        left_total = '{}/{}'.format(student.left_lessons,student.total_lessons)
+        withdrawn_date = student.leave_date
+        tmp_data = [student_id,student_name,gender,birth,contact,contact_no,source,cls,left_total,student_status,withdrawn_date]
+        csv_data.append(tmp_data)
+    echoer = Echo()
+    writer = UnicodeWriter(echoer)
+
+    def csv_itertor():
+        yield codecs.BOM_UTF8
+        for column in csv_data:
+            yield writer.writerow(column)
+    a = (tmp for tmp in csv_itertor())
+    response = StreamingHttpResponse(
+        a,
+        content_type="application/octet-stream"
+    )
+    response['Content-Disposition'] = 'attachment;filename="{}"'.format("withdrawn.csv")
+    return response
+
+#+END_SRC
+** push notification to phone use celery
+*** def push_broadcast_schedule_notify(broadcast_schedule_id, message):
+** raise exception to show line number
+#+BEGIN_SRC python
+import traceback
+
+traceback.print_exc()
+
+#+END_SRC
+** orm
+*** orm 批量创建 bulk_create()
+
+Happening.objects.bulk_create(happening_list, batch_size=10)
++ batch_size 控制每批数量
+  
+*** delete many to many fields
+annoncement.students.clear()
+*** delete related_foreighing key
+klass_schedule.klassschedule_times.all().delete()
+
+
+** Taidii code
+*** convert pic to pdf api
+发生在服务器转换完成后 回调 taidii 的服务器
+**** def handler_convert_app(app_name, upload_status=0, *args):
+
+*** 获取 user role name 以判断是 teacher or principal or guradian
+#+BEGIN_SRC python
+from taidiiuser.models improt TidiiUser
+
+role_name = TaidiiUser.get_taidii_user_property(request.user, 'role_name')
+center = TaidiiUser.get_taidii_user_property(request.user, 'center')
+
+#+END_SRC
+*** enrichemt 通过 klassschedule 获取学生
+#+BEGIN_SRC python
+klass_schedule = list(KlassSchedule.objects.filter(Q(date_to=None)|Q(date_to__gte=today), 
+                                date_from__lte=today, center=happening.center).values_list('id', flat=True).distinct())
+sk_schedule = list(StudentKlassSchedule.objects.filter(Q(end_date=None)|Q(end_date__gte=today), enroll_date__lte=today, 
+                            klassschedule__in=klass_schedule).values_list('id', flat=True).distinct())
+students = Student.objects.filter(student_klassschedules__in=sk_schedule).distinct()
+
+
+#+END_SRC
+* 🥏 pull request record
+** hq happenings
+*** https://github.com/Taidii/taidiiv2/pull/7161
+** online teaching
+*** https://github.com/Taidii/taidiiv2/pull/7208/commits
+
+* feature/zoomintegration
 * feature/myobChanges_992  			dev: ✅
 myob 导出改动
 * feature/merchandise_translate_1021
 - [Enrichment] 翻译 [Mentalmatics] 路径：Resource Management - Merchandise Management(翻译上一页 下一页)
 - dev: ✅
-* feature/enrichmentFinanceAddRefundList_974
+* feature/enrichmentFinanceAddRefundList_974  📍
 - dev: ✅
+** DONE 还需要加个 refund 号码 没做
+** DONE void 功能
+** DONE refund no. 不显示
+** 
+** [?] credit no 显示有问题？？
 * feature/studentAttendanceAddRemarks_994 
 ** dev: ✅
 ** 机构 Student Attendance 模块中，在 Remarks 栏和 Action 栏中间加入新的一栏，叫做 Additional Remarks， 可以进行修改
-** 更新 使用js + form 模版 + ajax 通信  重定向url  location.search
+** 更新 使用 js + form 模版 + ajax 通信  重定向 url  location.search
+* feature/physicalTestTranslation   dev_cn: ✅
+** 基本问题
+- 需要权限 physical 开头
+- 需要 dev.cn database   账号：demo china_cn
+- 英文排版有问题
+- [[http://localhost:8000/physicaltest-report/overall/analysis/]]
+** 技巧记录
+#+BEGIN_SRC python
+from django.utils import translation
+
+# 获取当前语言
+translation.get_language()
+
+# 激活某种语言的翻译
+user_language = "en_US"
+translation.activate(user_language)
+
+# 需国际化的代码用这个， html 用 trans 包裹， js 用 gettext()
+from django.utils.translation import ugettext_lazy as _
+
+#+END_SRC
+** database 里面的翻译： 
+*** physicaltest_physicalcategory
+| name          | eng                                         | measure |
+|---------------+---------------------------------------------+---------|
+| "身高"        | "Height",                                   |         |
+| "体重"        | "Weight"                                    |         |
+| "立定跳远"    | "Standing Long Jump",                       |         |
+| "网球抛掷"    | "Tennis Ball ThrowStanding Long Jump",      |         |
+| "10 米折返跑" | "10-meter Shuttle Run",                     |         |
+| "坐位体前屈"  | "Sitting Body Flexion10-meter Shuttle Run", |         |
+| "平衡木"      | "Balance Beam",                             |         |
+| "双脚连续跳"  | "Skip Jump",                                |         |
+*** physicaltest_guardiansuggestion 
+- 空的
+*** physicaltest_InterventionPlan 
+** report pdf url
+- physicaltest.views.student_report_pdf(
+- student_report_for_print(       /这个就是导出 html 的模版/
+- http://localhost:8000/physicaltest-report/student_report_for_print/87661/267/
+
+* feature/myobChanges    🌈️update  dev: ✅
+* feature/edg_feature      新的 edg 合并到 master 后的 
+** old branch
+feature/new_EDG_task
+*** feature/1783_zpj_hq_calendar    hq 增加 event  这个可以用 ✅
+*** feature/1784_stock_page
+*** feature/XQ_1564_block_close_date   换课/补课时，屏蔽学校关闭的日期
+
+** TODO resource management enrichment 权限有问题
+- 本地没有权限也可以访问 setting  ，未发现问题
+** 一张 excel 表格需要做 
+** migration file record 
+- finance/migrations/0061_auto__add_field_centerfinance_bold.py
+- resourcemanagement/migrations/0014_auto__add_packagehistory__add_itempackage__add_package.py
+- students/migrations/0023_auto__add_field_student_referral.py
+* feature/hq_discountCreateChanges_1041  dev: ✅
+SCHEDULED: <2020-03-22 Sun 14:00>
+- [Finance] 统一 HQ 与 Centre 的创建 Discount 页面[GEH]
+* feature/estore     ️🚀 🎯 🦠  benny use GenericViewSet
+* feature/hq_happenings      hq 切换学校显示数据 (🎯 celery async)
+- 新增 hq_happenings & annoncement
+- create update 接口更新
+- 之前的学校不能筛选出来当前 hq create 的数据
+** api 接口
+创建 happenings   /happenings/center/create/    	happenings.views.HappeningCreateView
+创建 annoucement  /announcement/create/         announcement.views.AnnouncementCreateView
+
+** DONE 不影响之前数据
+** permission record
+- {% if user|hq_has_permission:'happenings' or user|hq_has_permission:'announcement' or user|hq_has_permission:'survey' %}
+- app_name = 'happenings'
+  permission_name = 'manage'
+  
+** summary
+
+*** upload file convert 后回调保存问题
+taidii/convert/views.py
+def save2happening(center_id, db_name, db_id, file_url, image_list, upload_status=Happening.ING):
+* feature/diilearn
+* feature/hq_enrichment_report_1105
+** 权限
+ is_hq_permission_enable
+enrolment:enrolment_student_report
 
