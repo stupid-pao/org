@@ -112,7 +112,7 @@ class Myconponent2 extends React.Component {
 #+END_SRC
 ** 组件三大属性
 *** state
-特点 state 就叫 state， 不能直接更新， 不能直接修改， （借助 setState 方法）
+特点 state 就叫 state， 1.不能直接更新， 2.不能直接修改， （借助 setState 方法）
 Component 里面 自己定义的方法 拿不到 this 需要 bind this （react 底层弊端， vue 没这个问题）
 #+BEGIN_SRC js react
 
@@ -146,4 +146,104 @@ class Weather extends React.Component {
 + 必须更新初始化存在过的变量
 **** bind(this)
 在 Component 中的自己定义的方法 this  访问不到这个实例，所以需要 用 bind(this)
+**** state 的简写方式
++ 利用了 class 里面 直接定义属性，和箭头函数里面没有 this，没有 this 会向外找的特点，这时就找到了 class 的 this
++ 相当于 不使用 constructor 构造器
+  
+#+BEGIN_SRC js react
+class Weather extends React.Component {
+    // class 里面直接定义 变量名=xxx this可以直接访问到
+  state = {isHot:true}
+
+  render() {
+    let { isHot } = this.state
+
+    return <h1 onClick={this.changeWeather}>今天天气很{isHot ? '热' : '冷'}</h1>
+  }
+
+// 利用 变量=匿名函数，使变量名可以被this 访问到，而且 匿名函数里面本身没有this，但是匿名函数的this 和他外层的this 一致
+  changeWeather = () => {
+    this.setState({isHot: !this.state.isHot})
+
+  }
+}
+
+#+END_SRC
+*** props
+翻译过来 参数的意思
+其实就是 jsx 中 的组件在调用并传值的时候 class 内部可以访问到这部分值的一种防方式
+#+BEGIN_SRC js react
+import PropTypes from 'prop-types';
+
+<Person name="kobe" age={18} sex="男"/>
+
+
+class Person extends React.Component{
+  render() {
+    let { name, age, sex } = this.props
+    return (
+      <ul>
+        <li>{name}</li>
+        <li>{sex}</li>
+        <li>{age}</li>
+      </ul>
+    )
+  }
+}
+
+// 设定 props type 属性 和默认值
+Person.propTypes = {
+  name: PropTypes.string.isRequired,
+    age: PropTypes.number,
+    sex: PropTypes.string,
+}
+Person.defaultProps = {
+  name: 'Stranger',
+  age: 10,
+  sex: "不男不女",
+};
+
+#+END_SRC
+
+**** props 的简写
+#+BEGIN_SRC js react
+class Person extends React.Component{
+  static propTypes = {
+    name: PropTypes.string.isRequired,
+    age: PropTypes.number,
+    sex: PropTypes.string,
+  }
+
+  static defaultProps = {
+    age: 10,
+    sex: "不男不女",
+  }
+
+  render() {
+    let { name, age, sex } = this.props
+    return (
+      <ul>
+        <li>{name}</li>
+        <li>{sex}</li>
+        <li>{age}</li>
+      </ul>
+    )
+  }
+}
+
+#+END_SRC
+
+
+**** props 传参的简写
+正常来说 。。。 解包 只能用 解包数组， 但是 如果用 {} 阔上解包  可以解包对象
+#+BEGIN_SRC js react
+
+// 正常
+<Person name="kobe" age={18} sex="男"/>
+
+// 解包
+let person2 = {name:"sb", age:18, sex:"女"}
+<Person {...person2}/>
+
+#+END_SRC
 
