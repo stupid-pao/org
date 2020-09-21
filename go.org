@@ -1,0 +1,202 @@
+#+TITLE: Go
+
+* [[https://github.com/pope/ob-go][org-mode for go]]
+** example
+#+BEGIN_SRC go :results output :imports '("fmt" "time")
+
+fmt.Println("lskdjfsf")
+fmt.Println("Current Tiem:", time.Now())
+
+var a = []string{}
+a = append(a, "sb")
+fmt.Println(a)
+
+var b []string
+b = append(b, "sbb")
+fmt.Println(b)
+
+var m1 = make(map[string]string)
+var m2 = map[string]string{}
+
+fmt.Println(m1 == nil)
+fmt.Println(m2 == nil)
+
+
+#+END_SRC
+
+#+RESULTS:
+
+
+#+BEGIN_SRC go
+package main
+
+import "fmt"
+
+func Generate(ch chan<- int) {
+        for i := 2; ; i++ {
+                ch <- i // Send 'i' to channel 'ch'.
+        }
+}
+
+func Filter(in <-chan int, out chan<- int, prime int) {
+        for {
+                i := <-in // Receive value from 'in'.
+                if i%prime != 0 {
+                        out <- i // Send 'i' to 'out'.
+                }
+        }
+}
+
+func main() {
+        ch := make(chan int) // Create a new channel.
+        go Generate(ch)      // Launch Generate goroutine.
+        for i := 0; i < 10; i++ {
+                prime := <-ch
+                fmt.Println(prime)
+                ch1 := make(chan int)
+                go Filter(ch, ch1, prime)
+                ch = ch1
+        }
+}
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+2
+3
+5
+7
+11
+13
+17
+19
+23
+29
+#+end_example
+
+* 标准库
+** os 包
+#+BEGIN_SRC go
+package main
+import (
+	"fmt"
+	"os"
+)
+
+func main() {
+	dir, err := os.Getwd()
+	fmt.Println(dir)
+	fmt.Println(err)
+
+	fmt.Println(os.Getenv("PATH"))
+	fmt.Println(os.Getenv("GOROOT"))
+	fmt.Println(os.Getenv("GOBIN"))
+
+	envs := os.Environ()
+	for _, env := range envs {
+		fmt.Print(env)
+	}
+	fmt.Print("\n")
+
+	fileInfo, err := os.Stat("/Users/paozi/Documents/org/go.org")
+	if err == nil {
+		fmt.Println(fileInfo.IsDir())
+		fmt.Println(fileInfo.Mode())
+	}
+}
+
+#+END_SRC
+
+#+RESULTS:
+: /Users/paozi/Documents/org
+: <nil>
+: /usr/local/opt/gettext/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/paozi/anaconda/bin:/Users/paozi/.emacs.d/bin:/Users/paozi/go/bin
+: /usr/local/Cellar/go/1.14/libexec
+: /Users/paozi/go/bin
+: TERM=dumbTERM_PROGRAM=iTerm.appSHELL=/bin/zshTMPDIR=/var/folders/x9/cc_b7yhx7ll42j24y615t_ww0000gn/T/GOBIN=/Users/paozi/go/binTERM_PROGRAM_VERSION=3.3.9TERM_SESSION_ID=w0t6p0:148F3C17-6853-4716-B7D7-EFA89295DE5EZSH=/Users/paozi/.oh-my-zshUSER=paozihttp_proxy=http://127.0.0.1:1087COMMAND_MODE=unix2003PAGER=lessLSCOLORS=GxfxcxdxbxegedabagacadALL_PROXY=http://127.0.0.1:1087PATH=/usr/local/opt/gettext/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/paozi/anaconda/bin:/Users/paozi/.emacs.d/bin:/Users/paozi/go/binLaunchInstanceID=52F25FEF-D003-4743-8D7A-F7EB777A6B6CITERM_PROFILE=DefaultXPC_FLAGS=0x0ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YEShttps_proxy=http://127.0.0.1:1087XPC_SERVICE_NAME=0COLORFGBG=15;0SHLVL=1UPDATE_ZSH_DAYS=7GOROOT=/usr/local/Cellar/go/1.14/libexecLC_TERMINAL_VERSION=3.3.9ITERM_SESSION_ID=w0t6p0:148F3C17-6853-4716-B7D7-EFA89295DE5ELOGNAME=paoziLESS=-RLC_CTYPE=en_US.UTF-8FZF_DEFAULT_COMMAND=fd -IH -E '*.pyc'GOPATH=/Users/paozi/goDISPLAY=/private/tmp/com.apple.launchd.mangue9JGY/org.macosforge.xquartz:0LC_TERMINAL=iTerm2SECURITYSESSIONID=186aaCOLORTERM=truecolorLANG=en_CN.UTF-8__CF_USER_TEXT_ENCODING=0x1F5:0x0:0x0HOME=/Users/paoziSSH_AUTH_SOCK=/private/tmp/com.apple.launchd.UsQqE5ItN6/ListenersPWD=/Users/paozi/Documents/orgOLDPWD=/Users/paozi/Documents/org_=/usr/local/bin/go
+: false
+: -rw-r--r--
+
+** time 包
+#+BEGIN_SRC go
+package main
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	currentTime := time.Now()
+	fmt.Println(currentTime)
+	// year := currentTime.Year()
+	// month := currentTime.Month()
+
+	duration, _ := time.ParseDuration("-24h0m0s")
+	addTime := currentTime.Add(duration)
+	fmt.Println(addTime)
+	fmt.Println(currentTime.Sub(addTime))
+
+}
+
+#+END_SRC
+
+#+RESULTS:
+: 2020-05-13 21:55:27.541274 +0800 CST m=+0.000093045
+: 2020-05-12 21:55:27.541274 +0800 CST m=-86399.999906955
+: 24h0m0s
+** 获取命令行参数
+1. os.Args()
+2. flag 包
+** print
+#+BEGIN_SRC go
+package main
+import (
+    "fmt"
+)
+
+func main() {
+	
+}
+	
+
+#+END_SRC
+
+* test
+#+BEGIN_SRC go
+package main
+import (
+	"fmt"
+	"time"
+)
+
+func mytest() {
+	fmt.Println("hello go")
+}
+
+func main() {
+	go mytest()
+	fmt.Println("hello, world")
+	time.Sleep(time.Second)
+}
+
+
+#+END_SRC
+
+#+RESULTS:
+: hello, world
+: hello go
+
+* 结构体
+** 匿名结构体
+[[https://segmentfault.com/a/1190000018865258][这篇文章解释结构体重的匿名接口]]
+1. 结构体里面 嵌套匿名结构体
+2. 结构体里面 嵌套匿名 interface
+
+匿名的目的：
+前提：因为 结构体里的 匿名接口里的方法 在这个结构体实例化之后是可以直接调用的，所以才有这些操作
+
+就结构体中有匿名接口，那么想使用这个结构体 就必须要先满足这个接口才可以，（前提）
+然后可以重载这个接口中的方法（一种使用目的）
+或者是用作对这个接口做一些约束（另一种用法）
+   

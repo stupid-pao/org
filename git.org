@@ -29,3 +29,266 @@ grep -lr '<<<<<<<' . | xargs git checkout --theirs
 #+END_SRC
 
 
+
+
+
+# git 命令
+
+
+
+> ## 指定本地 与 origin 的分支跟踪
+> 
+
+- 如果要本地跟踪 origin 的 master 分支的话
+
+
+    git branch --track master origin/master
+    git push origin master / git pull origin master
+        
+    
+- 用了这两条条命令后，就可以直接 `git pull`，`git push` 了
+
+> ## 删除远程分支
+> 
+
+git push origin --delete < branchName >
+
+
+> ## 显示颜色
+> 
+
+```
+git config --global color.status auto
+git config --global color.diff auto
+git config --global color.branch auto
+git config --global color.interactive auto
+```
+
+
+```
+# 查看远程源
+git remote -v
+# 更改远程源
+git remote set-url <master> <origin/master>
+```
+
+ssh 慢解决办法
+
+#### [git clone 一个 github 上的仓库，太慢，经常连接失败，但是 github 官网流畅访问，为什么？ - 知乎](https://www.zhihu.com/question/27159393)
+#### [国内加速访问 Github 的办法，超级简单 - 知乎](https://zhuanlan.zhihu.com/p/65154116)
+
+### 解决 mac 系统 git push/git clone 代码速度太慢问题
+[解决 mac 系统 git push/git clone 代码速度太慢问题 - 陈锐军的个人空间 - OSCHINA](https://my.oschina.net/Jackcrj/blog/3000464)
+
+```
+git clone 慢解决方案（不依靠代理）
+原理： 解决 dns 污染即可
+1. 查找域名对应的 ip 地址，并修改 host 文件
+2. nslookup github.global.ssl.fastly.Net
+3. nslookup github.com
+4. 把上面 2 个写入 host
+5. 刷新 dns 缓存 
+    dscacheutit -flushcache sudo discoveryutit udnsflushcaches
+
+
+sudo vim /etc/hosts
+# /private/etc/hosts
+
+在文件末尾填上
+192.30.253.112 http://github.com
+151.101.184.133 http://assets-cdn.github.com
+151.101.72.249 github.global.ssl.fastly.net
+```
+
+
+```
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+```
+```
+[http "https://github.com"]
+  23  proxy = socks5://127.0.0.1:1086
+  24[https "https://github.com"]
+  25  proxy = socks5://127.0.0.1:1086
+  26[http]
+  27  proxy = socks5://127.0.0.1:1086
+  28[https]
+  29  proxy = socks5://127.0.0.1:1086
+```
+
+```
+vim ~/.ssh/config
+
+host github.com
+     user git
+     proxycommand nc -x localhost:1086 %h %p
+
+```
+
+
+#### [猴子都能懂的 GIT 入门 \| 贝格乐（Backlog）](https://backlog.com/git-tutorial/cn/)
+
+#### [Learn Git Branching 无敌可视化图解](https://learngitbranching.js.org/?demo)
+
+
+
+- 新建分支
+    - git checkout -b 《branch——name》
+
+- 删除远程分支
+    - git push origin :[分支名]
+
+- 删除 无效 submodule
+    - 先 git submodule --init 找出问题文件夹
+    - git rm --cached taidii/gitflow    
+    
+- 删除未跟踪文件
+   - git clean -f
+   - -nf 可以查看会删除哪些文件    
+
+- 连 untracked 的目录也一起删掉
+  - git clean -fd
+  
+- cherry-pick
+    - pick 连续分支
+    - git cherry-pick A3^..A5  => [A3, A5]
+    - 正常 cherry-pick 是前不包，后包的 (a,b]
+
+### stash 相关操作
+
+- 把工作区和暂存区的内容保存到进度列表里
+ 
+
+    git stash save “description”
+
+- 把工作区和暂存区的所有内容都保存到进度列表里，包括 untracked 的文件。
+
+
+    git stash save -u 'description'
+
+- 列出 stash 里的所有项
+
+
+    git stash list
+
+- 把进度恢复出来并删除进度列表中的项
+
+
+    git stash pop stash@{2}
+
+- 只把进度恢复出来，不删除进度列表中的项
+
+
+    git stash apply stash@{1}
+
+- 丢弃进度列表中的相关项
+
+
+    git stash drop stash@{3}
+ ———————————————— 
+
+```
+
+Host github.com
+     User git
+     ProxyCommand nc -x localhost:1086 %h %p
+```
+
+### git 查看某个 commit 的改动  git diff
+
+```
+git show COMMIT
+或
+git diff COMMIT^
+```
+
+```
+git diff                                       查看尚未暂存的文件更新了哪些部分
+
+git diff filename 查看尚未暂存的某个文件更新了哪些
+
+git diff –cached                    查看已经暂存起来的文件和上次提交的版本之间的差异
+
+git diff –cached filename 查看已经暂存起来的某个文件和上次提交的版本之间的差异
+
+git diff ffd98b291e0caa6c33575c1ef465eae661ce40c9 b8e7b00c02b95b320f14b625663fdecf2d63e74c 查看某两个版本之间的差异
+
+git diff ffd98b291e0caa6c33575c1ef465eae661ce40c9 --  filename b8e7b00c02b95b320f14b625663fdecf2d63e74c -- filename 查看某两个版本的某个文件之间的差异
+
+ git diff d63739d03b b759b73 -- centers/rest/views.py
+ 
+ 
+ git diff branch  比较 2 个分支的差异
+ 方法一：使用 2 个点
+ git diff branch1..branch2
+ git diff master..feature/new_br
+ 这种方法直接比较 2 个分支的不同
+ 
+ 方法二： 使用 3 个点
+ git diff branch1...branch2
+ git diff master...feature/new_feture
+ 这种方法比较 new_feature 从新建分支到当先 commit 一共有多少改动，类似 github 上面 pull request 时 files changed 的功能
+```
+>### git reset & revert
+>
+```
+# 回退一个 commit
+git reset HEAD^
+
+# 回退一个已经提交的 commit
+git revert HEAD
+
+# 回退一个已经提交的 merge
+git revert -m 1 HEAD
+还需要再 revert 一次(回退 merge 操作肯定要，只是 revert 时机问题)（恢复的是当时别隔离的 commit，相当于这些隔离的 commit 重新合并到当前分支）
+git revert <the_revert_commit>
+```
+- linux 回应该如何 revert
+
+[](https://mirrors.edge.kernel.org/pub/software/scm/git/docs/howto/revert-a-faulty-merge.txt)
+
+### git reflog
+查看操作历史，找到之前 HEAD 的 hash 值,然后恢复
+git reset --hard HEAD@{1}
+
+## git stash
+```
+git stash list
+git stash save 'xnxni'
+git stash pop <stash@{0}>
+git stash apply <stash@{0}>
+git stash drop 
+git stash clear
+```
+
+## git log
+
+```
+# 查看某个文件的变更记录 commit， 文件删除了也能用
+git log -- requirements.txt
+
+git log -p -- <filename>
+```
+
+## git remote
+添加远程仓库
+```
+git remote 
+origin git@github.com:stupid-pao/nvim-config.git
+
+```
+删除远程仓库
+```
+git remote rm origin
+```
+
+## git default editer  set
+```
+git config --global core.editor "nvim"
+```
+
+** git rebase
+git rebase 使用最好指定 当前分支和 要合并过来的分支， 因为不指定 和直接 git merge <branch_name> 是反着的
+
+使用：
+git rebase <current_branch> <need rebase branch>

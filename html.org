@@ -110,10 +110,54 @@
 **** 表单控件（表单元素）
 ***** <input> 输入元素
 #+BEGIN_SRC html
-<input type= "属性值" />
+<input type= "属性值" name= "" value= "" />
 
 #+END_SRC
 + <input /> 标签为单标签
 + type 设置不用的属性值,用来指定不同的控件类型
-  
+  | 属性值   | 描述          | 注意                                           |
+  | button   |               |                                                |
+  | file     |               |                                                |
+  | hidden   |               |                                                |
+  | image    |               |                                                |
+  | password |               |                                                |
+  | radio    | 定义单选按钮  | 需要定义相同的名字，name 属性，才能是同一类    |
+  | checkbox | 多选框/复选框 | 单选，和复选 默认选择属性： checked= "checked" |
+  | reset    | 定义重置按钮  |                                                |
+  | submit   | 提交按钮      |                                                |
+  | text     |               |                                                |
++ input 属性
+  | 属性      | 属性值         | 描述         |
+  | name      |                |              |
+  | value     |                |              |
+  | checked   |                |              |
+  | maxlength | maxlength="6"" | 最大长度为 6 |
+***** 禁止 input 内容编辑，之显示
+只需要加 disabled
+<input class='xx' type='test'>
+<input disabled class='xx' type='test'>
+<select >
+<select disabled>
+***** placeholder 显示 inpute 提示文字
+** 盒子模型
+*** border 边框
+border: border-width || border-style || border-color
++ border-style
+  none
+  hidden
+  dotted
+  dashed
+  solid
+  double
+  groove
+  ...
+简写： border： 1px solid red;  没有顺序
+边框分开写法：
+border-top:
+相邻边框合并
+border-collapse: collapse;
+*** content 内容
+
+*** padding 内边距
+*** margin 外边距
 

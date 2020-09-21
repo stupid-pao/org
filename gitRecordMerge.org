@@ -3,6 +3,24 @@
 * music 
 ** [[https://www.youtube.com/watch?v=zvkHSDO5VQ8][七里香]] 
 * 🌈️ code snipets
+** example
+#+BEGIN_SRC python :results output 
+from datetime import datetime
+import sys
+
+def abc(name): 
+    print('hello {}'.format(name))
+
+abc('xiao')
+print(datetime.now())
+print(sys.version_info)
+#+END_SRC
+
+#+RESULTS:
+: hello xiao
+: 2020-05-01 11:28:47.270706
+: sys.version_info(major=3, minor=7, micro=7, releaselevel='final', serial=0)
+
 ** upload picture use base64
 #+BEGIN_SRC python
 import base64
@@ -22,6 +40,9 @@ klass_schedule.cover.save(cover_name, cover_file, False)
 #+BEGIN_SRC python
 
 url(r'^withdrawn/xls/$', withdrawn_xls, name='withdrawn-xls'),
+
+from enrichment.csv_tools import Echo, Unicodewriter
+import codecs
 
 @login_required
 def withdrawn_xls(request):
@@ -98,15 +119,62 @@ Happening.objects.bulk_create(happening_list, batch_size=10)
 + batch_size 控制每批数量
   
 *** delete many to many fields
+# 这种方法只适用于 many to many 关系，并且 through 使用的是自己指定的 model 中间表
 annoncement.students.clear()
 *** delete related_foreighing key
 klass_schedule.klassschedule_times.all().delete()
+
+*** update
+[[https://juejin.im/post/5b588b656fb9a04fba6e8681][链接]]
+# json 更新  
+1. 方法 1
+    data = {'username':'nick','is_active':'0'}
+    User.objects.filter(id=1).update(**data)   # 不能更新 auto now 字段
+2. 2
+   #+BEGIN_SRC python
+    data = {'username':'nick','is_active':'0'}
+    _t = User.objects.get(id=1)
+    _t.__dict__.update(**data)
+    _t.save() 
+
+   #+END_SRC
+
+** remove csrf
+关闭 重启生效
+1. in APIView:
+   from django.utils.decorators import method_decorator
+   from django.views.decorators.csrf import csrf_exempt
+
+   class TestView(APIView):
+
+       @method_decorator(csrf_exempt)
+       def post(self, request):
+           pass
+2. from braces.views import CsrfExemptMixin
+
+** txt 乱码
+#+BEGIN_SRC python :results output
+# SB Windows 用的GBK编码格式
+with open('path', 'rb') as f:
+    contents = f.read()
+    print(contents.decode('GBK'))
+
+#+END_SRC
+
+** url 解析 reverse
+from django.core.urlresolvers import reverse
+
+url = reverse('kiple:kiple-callback')
 
 
 ** Taidii code
 *** convert pic to pdf api
 发生在服务器转换完成后 回调 taidii 的服务器
 **** def handler_convert_app(app_name, upload_status=0, *args):
+*** image upload
+**** qiniu
+/api/photo/image_upload_v2/    获取七牛返 token
+def qiniu_callback()
 
 *** 获取 user role name 以判断是 teacher or principal or guradian
 #+BEGIN_SRC python
@@ -116,6 +184,9 @@ role_name = TaidiiUser.get_taidii_user_property(request.user, 'role_name')
 center = TaidiiUser.get_taidii_user_property(request.user, 'center')
 
 #+END_SRC
+
+#+RESULTS:
+
 *** enrichemt 通过 klassschedule 获取学生
 #+BEGIN_SRC python
 klass_schedule = list(KlassSchedule.objects.filter(Q(date_to=None)|Q(date_to__gte=today), 
@@ -124,38 +195,115 @@ sk_schedule = list(StudentKlassSchedule.objects.filter(Q(end_date=None)|Q(end_da
                             klassschedule__in=klass_schedule).values_list('id', flat=True).distinct())
 students = Student.objects.filter(student_klassschedules__in=sk_schedule).distinct()
 
+# 另一种
+student_classes = StudentClass.objects.filter(Q(student__leave_date__isnull=True) | Q(student__leave_date__gte=today),
+                        klass__in=classes, student__enter_date__lte=today) \
+                    .exclude(Q(student__enrollment_form__status__in=(0, 1, 4, 6)) | \
+                        Q(student__enrollment_form__status=5, student__student_graduation__graduation_date__lt=today)) \
+                    .values("student__fullname", "student__id", "klass__name", "klass__id").distinct()
 
 #+END_SRC
+*** 拼接 photo url 适配七牛或亚马逊 get_photo_url
+from gallery.helper import get_photo_url
+*** celery
+celery 定时任务： beat
+异步任务： worker
+
+**** 命令
+celery -A taidii purge  
+celery -A taidii worker -l debug
+celery beat -A taidii -l debug
+**** [[https://www.jianshu.com/p/a556cac5bf7d][中文文档]]
+**** 技巧记录
++ task 参数
+    #+BEGIN_SRC python
+    @task(bind=True)
+    def do_job(self, path):
+        cache.set(self.request.id, operation_results)
+
+    # 指定bind=True 时,有 self 参数， self.request.id 就是当前 task 的id
+
+    # 结束任务 使用
+    # celery-task-tigger
+    # app.control.revoke('task_id')
+
+    # celery 3.1
+    >>> from proj.celery import app
+    >>> app.control.revoke(task_id)
+
+    from celery.task.control import revoke
+    revoke(task_id, terminate=True)
+
+    #+END_SRC
++ add.apply_async() 参数
+  http://docs.jinkan.org/docs/celery/userguide/calling.html#eta-and-countdown
+  ETA and countdown
+
+  expires=60 允许等待最大时长
+*** sql 速度 bar
+    # from django.shortcuts import render
+    # template_name = 'accounts/login.html'
+    # return render(request, template_name, {})
+
+* 🌈️ 理解
+** 对 GenerateViewset 的理解
+action 加分页 paginate
+#+BEGIN_SRC python
+
+page = self.paginate_queryset(instances)
+if page is not None:
+    return Response(StudentAssignmentSerializer(page, many=True).data)
+return Response(StudentAssignmentSerializer(instances, many=True).data)
+
+#+END_SRC
+** 对 serializer 的理解
+参数：
+Serializer(instance, data={}, files=request.FILES, partial=True)
+- 没有实例 就是创建
+- partial 允许部分更新
+serializer = Serializer()
+vaid = serializer.is_valid()   
+if vaid:
+    serializer.save()
+    data = serializer.data # serializer.validated_data
+else:
+    err = serializer.errors
+# 保存
+serializer.save()
+# 保存额外参数
+serializer.save(owner=request.user)
+
+    
 * 🥏 pull request record
 ** hq happenings
 *** https://github.com/Taidii/taidiiv2/pull/7161
 ** online teaching
 *** https://github.com/Taidii/taidiiv2/pull/7208/commits
 
-* feature/zoomintegration
-* feature/myobChanges_992  			dev: ✅
+** feature/zoomintegration
+** feature/myobChanges_992  			dev: ✅
 myob 导出改动
-* feature/merchandise_translate_1021
+** feature/merchandise_translate_1021
 - [Enrichment] 翻译 [Mentalmatics] 路径：Resource Management - Merchandise Management(翻译上一页 下一页)
 - dev: ✅
-* feature/enrichmentFinanceAddRefundList_974  📍
+** feature/enrichmentFinanceAddRefundList_974  📍
 - dev: ✅
-** DONE 还需要加个 refund 号码 没做
-** DONE void 功能
-** DONE refund no. 不显示
-** 
-** [?] credit no 显示有问题？？
-* feature/studentAttendanceAddRemarks_994 
-** dev: ✅
-** 机构 Student Attendance 模块中，在 Remarks 栏和 Action 栏中间加入新的一栏，叫做 Additional Remarks， 可以进行修改
-** 更新 使用 js + form 模版 + ajax 通信  重定向 url  location.search
-* feature/physicalTestTranslation   dev_cn: ✅
-** 基本问题
+*** DONE 还需要加个 refund 号码 没做
+*** DONE void 功能
+*** DONE refund no. 不显示
+*** 
+*** [?] credit no 显示有问题？？
+** feature/studentAttendanceAddRemarks_994 
+*** dev: ✅
+*** 机构 Student Attendance 模块中，在 Remarks 栏和 Action 栏中间加入新的一栏，叫做 Additional Remarks， 可以进行修改
+*** 更新 使用 js + form 模版 + ajax 通信  重定向 url  location.search
+** feature/physicalTestTranslation   dev_cn: ✅
+*** 基本问题
 - 需要权限 physical 开头
 - 需要 dev.cn database   账号：demo china_cn
 - 英文排版有问题
 - [[http://localhost:8000/physicaltest-report/overall/analysis/]]
-** 技巧记录
+*** 技巧记录
 #+BEGIN_SRC python
 from django.utils import translation
 
@@ -170,8 +318,8 @@ translation.activate(user_language)
 from django.utils.translation import ugettext_lazy as _
 
 #+END_SRC
-** database 里面的翻译： 
-*** physicaltest_physicalcategory
+*** database 里面的翻译： 
+**** physicaltest_physicalcategory
 | name          | eng                                         | measure |
 |---------------+---------------------------------------------+---------|
 | "身高"        | "Height",                                   |         |
@@ -182,55 +330,320 @@ from django.utils.translation import ugettext_lazy as _
 | "坐位体前屈"  | "Sitting Body Flexion10-meter Shuttle Run", |         |
 | "平衡木"      | "Balance Beam",                             |         |
 | "双脚连续跳"  | "Skip Jump",                                |         |
-*** physicaltest_guardiansuggestion 
+**** physicaltest_guardiansuggestion 
 - 空的
-*** physicaltest_InterventionPlan 
-** report pdf url
+**** physicaltest_InterventionPlan 
+*** report pdf url
 - physicaltest.views.student_report_pdf(
 - student_report_for_print(       /这个就是导出 html 的模版/
 - http://localhost:8000/physicaltest-report/student_report_for_print/87661/267/
 
-* feature/myobChanges    🌈️update  dev: ✅
-* feature/edg_feature      新的 edg 合并到 master 后的 
-** old branch
+** feature/myobChanges    🌈️update  dev: ✅
+** feature/edg_feature      新的 edg 合并到 master 后的 
+*** old branch
 feature/new_EDG_task
-*** feature/1783_zpj_hq_calendar    hq 增加 event  这个可以用 ✅
-*** feature/1784_stock_page
-*** feature/XQ_1564_block_close_date   换课/补课时，屏蔽学校关闭的日期
+**** feature/1783_zpj_hq_calendar    hq 增加 event  这个可以用 ✅
+**** feature/1784_stock_page
+**** feature/XQ_1564_block_close_date   换课/补课时，屏蔽学校关闭的日期
 
-** TODO resource management enrichment 权限有问题
+*** TODO resource management enrichment 权限有问题
 - 本地没有权限也可以访问 setting  ，未发现问题
-** 一张 excel 表格需要做 
-** migration file record 
-- finance/migrations/0061_auto__add_field_centerfinance_bold.py
-- resourcemanagement/migrations/0014_auto__add_packagehistory__add_itempackage__add_package.py
-- students/migrations/0023_auto__add_field_student_referral.py
-* feature/hq_discountCreateChanges_1041  dev: ✅
+*** 一张 excel 表格需要做 
+**** TODO grading exam 左边标签不显示
+**** TODO hq 日历权限
+
+*** migration file record 
+- finance/migrations/0067_auto__add_field_centerfinance_bold.py
+- resourcemanagement/migrations/0021_auto__add_packagehistory__add_package__add_itempackage.py
+- students/migrations/0025_auto__add_field_student_referral.py  
+** feature/hq_discountCreateChanges_1041  dev: ✅
 SCHEDULED: <2020-03-22 Sun 14:00>
 - [Finance] 统一 HQ 与 Centre 的创建 Discount 页面[GEH]
-* feature/estore     ️🚀 🎯 🦠  benny use GenericViewSet
-* feature/hq_happenings      hq 切换学校显示数据 (🎯 celery async)
+** feature/estore     ️🚀 🎯 🦠  benny use GenericViewSet
+** feature/hq_happenings      hq 切换学校显示数据 (🎯 celery async)
 - 新增 hq_happenings & annoncement
 - create update 接口更新
 - 之前的学校不能筛选出来当前 hq create 的数据
-** api 接口
+*** api 接口
 创建 happenings   /happenings/center/create/    	happenings.views.HappeningCreateView
 创建 annoucement  /announcement/create/         announcement.views.AnnouncementCreateView
 
-** DONE 不影响之前数据
-** permission record
+*** DONE 不影响之前数据
+*** permission record
 - {% if user|hq_has_permission:'happenings' or user|hq_has_permission:'announcement' or user|hq_has_permission:'survey' %}
 - app_name = 'happenings'
   permission_name = 'manage'
   
-** summary
+*** summary
 
-*** upload file convert 后回调保存问题
+**** upload file convert 后回调保存问题
 taidii/convert/views.py
 def save2happening(center_id, db_name, db_id, file_url, image_list, upload_status=Happening.ING):
-* feature/diilearn
-* feature/hq_enrichment_report_1105
-** 权限
+** feature/diilearn
+** feature/hq_enrichment_report_1105
+*** 权限
  is_hq_permission_enable
 enrolment:enrolment_student_report
+** feature/mindStretcher_multipleLoginForTeacher_1143
++ 步骤：
+  1. 登录时知道 可以切换多机构账号
+  2. 新 API， 切换机构时，返回那个学校的 token
+*** DONE 消息推送
+Commbook and happenings announcement
+  
+*** KILL center.logo.url  不安全
+hq 发 teacher announcement
+多机构 完美 自动跳转
+*** DONE 连锁 teacher 发消息标记 center name
+
+** feature/financeDiscountScript_1134
+用 admin 账号登录后台 能看到 script 栏
+*** api
+/backendmanageplatform/script/searchcenterfromid/	backendmanage.views.SearchCenterFromId	backendmanage:search-center-from-id
+http://localhost:8000/backendmanageplatform/script/copycenterpermission/
+CalculateDiscountAPI
+*** DONE 刷回脚本
+** kiple epayment
+*** 思路
+**** 请求 支付 api， 包含处理返回值
+**** 回调 api, 异步调用
+***** 会进行 6 次 calback， 如果收到返回 200 请求则停止 callback
+**** 字段记录
+***** 由我们生成的标记字段(请求带上，kaple 反回给我们的时候用)
+ord_mercID          配置里面的 id
+ord_mercref         order ref   用来标记货物
+ord_totalamt        order total  
+***** 请求必须字段
+ord_date
+ord_totalamt
+ord_gstamt   0.00   （请求不同）
+ord_shipname
+ord_mercref             Order Ref
+ord_mercID
+ord_returnURL       请求成功跳转回我们也页面
+merchant_hashvalue     = "{}.{}.{}.{}".format(merchant_secret, ord_mercID, ord_mercref, ord_totalamt(取消小数点) ) 
+ord_key 和上面一样 回调用的 多一个  returncode 
+
+*** feature/kiple   1158   dev: ✅
+**** api 记录
+for finance invoice
++ financev2.rest.views get_epayment_credentials()
++ epayment.helpers get_center_epayment_name_list()
+
+for the estore and parent center course. its different
+currently it only support only OCBC Paynow  so will need to update the api and support compatibility
++ estore.rest.views.EStoreOrderViewset  get_ocbc_payment_info()
+
+callback:
++ eghlpaymentmy.rest.views.eghl_my_callback
++ or ocbcpaynow.rest.views.ocbc_paynow_credits_notification    # for estore
+        generate_ocbc_paynow_receipt()
+**** 问题
+1. 这个方式安全吗？ 中间人攻击就完蛋了啊
+   secret 中间人不知道
+2. 重复支付的问题，
+3. generate_receipt successlog 没生成
+   
+
+** imp/diilearnChangeClassName_1174
+【diilearn】以前补习机构创建课程，哪怕有了学生，这个课程的名称还是可以改的，现在新开发的直播课程，不可以了
+
+
+** imp/resourceManagementAccess_1178
+    废弃
+** feature/saleExportFollowUp_1200
+[Enrichment] Sale - Potential Customer - Follow Up 中增加导出按钮	
+** hotfix/OnlineCourseSwitch
+** imp/happeningsName_1213  master:✅
+** feature/saleFilterLeftLession_1201  dev: ✅   pr: ✅
+** imp/FianceStudentDefalutValue_1203  def: ✅
+
+** feature/GroupChartNotification_850    dev: ✅  master： ✅
+CommbookViewSet      单个 commbook
+GroupMessagesViewSet   群聊
+*** 有 migration 需要注意
+*** 问题
+需要排除本人
+
+** imp/cameraScheduleSettings_131     🚀 对 serializer 的理解   master: ✅
+*** DONE update camera 接口
+*** TODO camera app list api
+*** 记录问题
+
+**** 如果 migration 出问题
+1. 删除 cameraSettings 里面所有内容
+2. migtation 逻辑是先删除表 再新建表
+3. 所有数据都没了？？？？？？
+** feature/nl_courseact_livecourse    parentcenter live course
+*** 记录
+以前的 添加 broadcastschedule task
+AddClassAjaxView
+UpdateClassAjaxView
+** feature/nl_courseact_livecourse  parent center online course 
+** feature/safeEntry_1272   diibear 考勤    ⚠️ bug！ 🥊
+Center Misc Settings:
+    centers/settings/miscconfig.html
+    centers.views.CenterMiscView()
+diilight 考勤接口:
+    /api/attendance/
+    /api/student/%@/attendance_day/     StudentViewSet
+model:
+   StudentDailyOverview 
+   StudentAttendance
+ 
+/api/student/safe_entry/
+** imp/courseactPayment   courseact 特殊学校购买
+** hotfix/groupChat
+** hotfix/hq_happenings_1236
+share_hq_announcement
+share_hq_happenings
+** imp/deleteStudentFromCourse_1269
+** hotfix/singleInvoice_1289   dev:✅
+** feature/healthyForm_1294
+健康申报
+diibot create api: VisitorViewSet
+设置： HealthRemarksView
+** imp/pdf_14_1286
+** hotfix/ADVCalculate_1333
+sale/student_class/delete/
+/sale/student_class/delete/	sale.views.DeleteStudentClassAjaxView
+** feature/homework_1313
+*** [[https://documenter.getpostman.com/view/4243392/T17KdS1m?version=latest][文档]]
+*** DONE 家长端 可以看到的课程列表
+** 1366 🔔显示消息不一致
+** feature/mindstrecher_1445
+teacher 错账号切换
+https://zhuanlan.zhihu.com/p/76795134
+【Mindstretcher】Same user name to multiple center  多账号切换 web 端
+# 切换 session  多账号切换
+sf_teacher = self.salesforce_teachers[1]
+from django.contrib.auth import login
+sf_teacher.user.backend = 'django.contrib.auth.backends.ModelBackend'
+login(request, sf_teacher.user)
+**  feature/myob_1403
+    imports.views.StudentView
+** hotfix/exportPDF_1405
+** feature/studentProfileImport_1396
+Import past student info and withdrawn students info
+enrollment.models.Statistics  通过这个表记录 历史有 withdraw 后来又入学的
+*** 改动了工具函数， 查 withdraw 学生的
+  EnrollmentFormManager   _get_form_list
+*** 改动
+# def get_simple_content(self, force=False):
+** feature/estorepayment_xq
+ocbc dev-new  注释内容：
+    ~/Documents/taidi/taidiiv2/taidii/ocbcpaynow/rest/views.py   :96   :68
+
+** hotfix/surveyTotalNumber_1351
+SurveyViewResultView
+survey/survey_result.html
+/api/surveys/3681/results   SurveyViewSet  result()
+
+** feature/exportQRcodeForTeacher_1490
+[zenaco] export QR code for teacher on V2
+- diilight QRcode api: api/attendance/qrcode/  teacher_guardian_qrcode
+
+- then for the pdf export you can refer to the student qr code export
+    Settings -> Class -> Select 1 Class -> Export QRcodes -> Select student -> Export Student Card / Export GGuardin Qrcodes
+
+- ShowGuardiansQrcodeView  student view
+  barcodes/guardians_qrcode.html
+
+- generate qrcode: GenerateQrcode
+
+- export  pdf use canvas
+  export_portfolio_pdf()
+  
+*** tips:
+使用 reportlab canvas generate QRcode
+** feature/medicineAddTime_1408
+喂药时间提示和签字
+*** MedicationRequestViewsets /parent_add_requests/ 
+/api/medication/medication_record/%@/show_records/
+定时 settings：575
+pushByTime()
+
+*** TODO 需要 remove celety task code
+
+** feature/preschoolHomework_1349
+幼儿园 作业模块
+** imp/sale_export
+优化代码，之前太卡了
+** feature/enroll_hisotry_1328
+*** feature/enroll_hisotry_1328_new
+1346
+增加页面显示 withdraw history
+reenroll student 会增加记录 之前的班级 入学，离校日期
+
+** hotfix/import_student
+** imp/permissionForDelete_1526
+add permission: sale:delete_student
+** hotfix/registration_no_1527
+/sale/get_next_registration_no/   获取下一个 号码
+/sale/student/create/
+ /sale/student/enroll/  试课
+*** 问题记录
+1. 因为 center.registration_no_current_no  这个记录没有更新，每次都靠遍历存在就加 1，所以会号码会重复
+** feature/report_VAN_1503
+Export UOB VAN report
+NascanGiroSetting
+*** permission:
+    app_name = 'finance'
+    permission_name = 'nascan-girosettings'
+*** model:
+CenterOCBCBankGiroInfo(models.Model):
+
+{% if user|has_permission:'finance:nascan-van-report' %}
+
+** imp/export_attendance_1517
+在 Student Attendance - Export attendance - Excel 格式导出的所有 excel 报表中，添加一个 All 标签页，显示所有学生。其他分班显示的不改动。
+/reports/attendance/student/attendancelist/month/0/xls/       reports.views_attendance.student_monthly_attendance_list_xls
+** imp/attendance_rate_export_1518
+ 出勤率报表优化 [Nascans]
+*** 🌈页面增加 input 动态显示 是否显示  input
+** imp/program_type_1533
+改动 student program_type
+同步需要改动的：model：
+help to update 
+Model 
+    Finance.HQLevelDiscount
+    Finance.CenterItemProgramType
+    Student.StudentProgramType
+
+** hotfix/staff_private_attendance_1532
+没有的：
+url: http://localhost:8000/staffs/private/   attendance 选项
+staffs.views.private_profile()
+staffs/private_profile.html
+这个是通过接口请求的
+api/staff/21132/attendances/?date_from=03-08-2020&date_to=06-08-2020    staffs.rest.views.StaffProfileViewSet
+有的：
+attendance.views.teacher_list
+attendance/teacher_list.html
+** feature/nascans_registration_form_1387
+center.custom_field_names('acknowledgement')}  CenterCustomFieldName   acknowledgement
+premission:
+    # registration:nascans_enrollment
+    enrolment:nascans_enrollment
+    
+*** TODO  每个字段数据库成功保存
+*** TODO  acknowledgement 是否可以替换
+*** 1388
+permission
+{% if user|has_permission:'enrolment:nascans_with_primary' %}
+少数学校需要加这个权限 来显示 primary scholl 字段
+
+
+** 权限设置 assignment nascans
+DiilightAppMenu
+DiilightAppModules    Nascans Assignment
+** imp/gradingExam_1561
+** feature/add_class_history
+1346
+permission:
+    {% if user|has_permission:'students:view-history' %}
+**  imp/myob_1541
+** hotfix/enrollment_statistics
+** imp/export_student_attendance_1563  dev:✅
+添加 All 标签在导出报表中 [Nascans]
 

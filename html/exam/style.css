@@ -1,0 +1,14 @@
+a {
+    display: block; 
+    background: #5E6263;
+    color: #FDFFFC;
+    text-decoration: none;
+    height: 40px;
+    width: 200px;
+    font-size: 14px;
+    text-indent: 2em;
+    line-height: 40px;
+}
+a:hover {
+    background: #F6761E;
+}

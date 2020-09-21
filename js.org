@@ -1,0 +1,123 @@
+#+TITLE: javascript
+
+
+* html 引入 js 的几种方式
+** 标签内触发
+<a href= "javascript:alert('alert something')"></a>
+<a href= "javascript:"></a>
+<button onclick="alert('dian yi xia')"
+** <javascript></javascript> 标签内触发
+<javascript>
+  alert('123456')
+  document.write('somethings')
+  console.log('234')
+  
+</javascript>
+** <javascript src= "js/script.js"></javascript>  src 引入
+** ⚠ 如果 <javascript> 标签有 src 那么标签内部的 js 无作用，需要新写一个 <javascript> 标签
+* js 语法
+** 6 种数据类型
+*** String
+*** Number
+*** Boolean
+*** Null
+*** Undefined
+*** Object
+** 强制类型转换  
+*** 转换成 String
+#+BEGIN_SRC js :results output
+var a = 123;
+
+console.log(typeof(a));
+console.log(a);
+// 方法1
+b = a.toString();
+console.log(typeof(b));
+console.log(b);
+
+// 方法 2
+b = String(a)
+console.log(typeof(b));
+console.log(b);
+
+#+END_SRC
+
+#+RESULTS:
+: number
+: 123
+: string
+: 123
+: string
+: 123
+
+*** to Number
+#+BEGIN_SRC js :results output
+var a = '123';
+
+console.log(typeof(a));
+console.log(a);
+// method 1
+b = Number(a)
+console.log(typeof(b));
+console.log(b);
+// 有数字字符 转换为  NaN
+// boolean => number
+    //true        1
+    //false       0
+// method 2 专门对付字符串
+var a = '456px'
+
+a = parseInt(a)
+console.log(typeof(a))
+console.log(a)
+b = parseFloat(a)
+console.log(typeof(b));
+console.log(b);
+
+
+
+
+#+END_SRC
+
+#+RESULTS:
+: string
+: 123
+: number
+: 123
+: number
+: 456
+: number
+: 456
+** 对象
+*** 新建对象
+#+BEGIN_SRC js :results output
+
+obj = new Object();
+obj.name = 'xiao'
+obj.gender = 18
+obj["123"] = 456
+
+console.log(obj)
+console.log(obj["123"])
+console.log('name' in obj)
+
+delete obj.name
+console.log(obj)
+
+obj2 = {
+    name: "qian",
+    age: 28,
+    gender: "male"
+}
+console.log(obj2)
+
+
+#+END_SRC
+
+#+RESULTS:
+: { '123': 456, name: 'xiao', gender: 18 }
+: 456
+: true
+: { '123': 456, gender: 18 }
+: { name: 'qian', age: 28, gender: 'male' }
+

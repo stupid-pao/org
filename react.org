@@ -1,0 +1,149 @@
+#+TITLE: React
+
+
+* pnpm + Vite + urql
+
+** pnpm:
+npm 的替代 速度快， 空间占用科学
+** Vite:
+app 生成脚手架
+*** 步骤：
+pnpm init vite-app gh-explorer --template react
+cd gh-explorer
+pnpm i
+pnpm dev
+* ES6 模块化
++ 暴露：
+  + 分别暴露，统一暴露
+    #+BEGIN_SRC js
+
+    // 分别暴露
+    export function sum(a, b) {
+        return a + b
+    }
+
+    // 统一暴露
+    function sub(a, b) {
+        return a - b
+    }
+    // export { sub as sub };
+    export { sub };
+    // 统一暴露
+    #+END_SRC
+  + 默认暴露
+    #+BEGIN_SRC js
+
+    // 默认暴露
+    export default {
+        mul: function(a, b) {
+            return a*b
+        },
+
+        div: function(a, b) {
+            return a/b
+        },
+
+        // 或者   简写方式
+        mul1(a, b) {
+            return a*b
+        },
+        div(a, b) {
+            return a/b
+        }
+    }
+    #+END_SRC
++ 引入：
+    #+BEGIN_SRC js
+        import { sum } from './module1';
+        import { sub } from './module2';
+        import module3 from './module3';
+
+
+        console.log(sum(1, 3))
+        console.log(sub(3, 1))
+        console.log(module3.div(4/2))
+
+    #+END_SRC`
+  1. import {} from './xx/xx'
+  2. import a from './xxx/xx'
+
+   
+* jsx 
+** 语法规则
++ className
++ {}  里面写 js
+ ⚠️注意：{} 里面只能写表达式，言外之意 function 或者 箭头函数
+ 一个表达式 会产生一个值
++ 最外层 只能包含一个 标签，（最后外面套一个 div 一般）
++ 组件 标签首字母大写
++ 
+** 作用
+简化创建 react 虚拟 dom 的创建，
+创建的其实是虚拟 dom
+** 其他
+babel 可以吧 jsx 转化成 js
+* react 面向组件编程
+** 创建组件的两种方式
+*** 工厂函数定义组件
+这种 组件其实是一个函数 (函数名首字母大写), 在 jsx 里面 用标签调用, jsx 渲染 这个函数的返回值
+#+BEGIN_SRC js react
+function Mycoponent() {
+  return <h2>fuck</h2>
+}
+
+# html
+<Mycoponent/>
+
+#+END_SRC
+*** es6 类组件
+#+BEGIN_SRC js react
+class Myconponent2 extends React.Component {
+  // 构造器 new 的时候 初始化用
+  constructor(a) {
+    super(a)
+  }
+
+  // 重写从父类继承的 render
+  render() {
+    return <h2>es6 类组件创建的 复杂组件</h2>
+  }
+}
+
+#+END_SRC
+** 组件三大属性
+*** state
+特点 state 就叫 state， 不能直接更新， 不能直接修改， （借助 setState 方法）
+Component 里面 自己定义的方法 拿不到 this 需要 bind this （react 底层弊端， vue 没这个问题）
+#+BEGIN_SRC js react
+
+class Weather extends React.Component {
+  constructor(a) {
+    super(a)
+    this.state = {isHot:true}
+    this.changeWeather = this.changeWeather.bind(this)
+  }
+
+  render() {
+    let { isHot } = this.state
+
+    return <h1 onClick={this.changeWeather}>今天天气很{isHot ? '热' : '冷'}</h1>
+  }
+
+  // 自己写的方法， 里面想使用 this 会报 undefined， 必须用 bind (react 底层的问题， vue 没有这个问题)
+  changeWeather() {
+    // console.log(this)
+    // this.state.isHot = !this.state.isHot
+    // 组件实例的 state: 1. 不能直接修改 2.不能直接更新
+    this.setState({isHot: !this.state.isHot})
+
+  }
+}
+
+#+END_SRC
+
+**** setState
++ setState 属于更新操作，(更新的 可能不是全部舒适化的变量)
++ 必须更新初始化存在过的变量
+**** bind(this)
+在 Component 中的自己定义的方法 this  访问不到这个实例，所以需要 用 bind(this)
+
