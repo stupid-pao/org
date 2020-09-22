@@ -1,5 +1,5 @@
 #+TITLE: React
-
+🔴
 
 * pnpm + Vite + urql
 
@@ -246,4 +246,89 @@ let person2 = {name:"sb", age:18, sex:"女"}
 <Person {...person2}/>
 
 #+END_SRC
+*** ref
+ref 和 refs 就是类似 id 一样给标签做标记，方便找到
+ref 标记， this.refs 拿到标记的标签
+🔴注意️：能不用就不用，event 有时候也可以
+#+BEGIN_SRC js react
+class MyComponent extends React.Component{
+
+  clickButton = () => {
+    alert(this.refs.input1.value)
+  }
+
+  blurHandler = (event) => {
+    alert(event.target.value)
+  }
+
+  render() {
+    return (
+      <div>
+        // 注意 这个方式已经被遗弃
+        <input name="" type="text" ref="input1"/>&nbsp;
+        <button onClick={this.clickButton}>click</button>&nbsp;
+        <input name="" type="text" placeholder='点点点点' onBlur={this.blurHandler}/>
+      </div>
+    )
+  }
+}
+
+#+END_SRC
+**** ref 新写法(基于回调)
+
+原理：react 会调用 ref， 并把当前节点 传入给 ref 表达式, 然后手动指定变量 赋值给当前节点
+<input type="text" ref={ (input) => {this.input1 = input} }/>&nbsp;
+<input type="text" ref={ input => this.input1 = input }/>&nbsp;
+
+#+BEGIN_SRC js react
+class MyComponent extends React.Component{
+
+  clickButton = () => {
+    alert(this.myTargetInput.value)
+  }
+
+  blurHandler = (event) => {
+    alert(event.target.value)
+  }
+
+  render() {
+    return (
+      <div>
+        <input type="text" ref={ input => this.myTargetInput = input }/>&nbsp;
+        <button onClick={this.clickButton}>click</button>&nbsp;
+        <input type="text" placeholder='点点点点' onBlur={this.blurHandler}/>
+      </div>
+    )
+  }
+}
+
+#+END_SRC
+**** ref 新写法(基于 createRef)
+利用 React.createRef() 创建一个容器（专用）
+
+#+BEGIN_SRC js react
+class MyComponent extends React.Component{
+
+  myRef = React.createRef()
+
+  clickButton = () => {
+    alert(this.myRef.current.value)
+  }
+
+  blurHandler = (event) => {
+    alert(event.target.value)
+  }
+
+  render() {
+    return (
+      <div>
+        <input type="text" ref={ this.myRef }/>&nbsp;
+        <button onClick={this.clickButton}>click</button>&nbsp;
+        <input type="text" placeholder='点点点点' onBlur={this.blurHandler}/>
+      </div>
+    )
+  }
+}
+#+END_SRC
+** 组件的组合
 

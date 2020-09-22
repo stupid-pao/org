@@ -638,6 +638,12 @@ permission
 DiilightAppMenu
 DiilightAppModules    Nascans Assignment
 ** imp/gradingExam_1561
+json
+#+BEGIN_SRC json
+grade_json: "{"MA1_id":"174","MA1_name":"DAN","mark0":"135","MA2_id":"157","MA2_name":"Grade 1","mark1":"125","AA1_id":"31","AA1_name":"Grade 1","mark2":"90","mark3":"100","mark4":"105","AA2_id":"","AA2_name":"--","mark5":"0","mark6":"0","mark7":"0","Aural_id1":"4","Aural_name1":"4","Aural_id2":"3","Aural_name2":"3","mark8":"3","remarks_name":"MA DAN 6"}"
+
+#+END_SRC
+
 ** feature/add_class_history
 1346
 permission:
@@ -646,4 +652,8 @@ permission:
 ** hotfix/enrollment_statistics
 ** imp/export_student_attendance_1563  dev:✅
 添加 All 标签在导出报表中 [Nascans]
+** hotfix/diilight_student_list_1587 dev:✅
+diilight student list 列表 显示不一致
+
+** hotfix/attendance_export_1608
 
