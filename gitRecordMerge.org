@@ -656,4 +656,5 @@ permission:
 diilight student list 列表 显示不一致
 
 ** hotfix/attendance_export_1608
+** imp/sale_list_1581
 
