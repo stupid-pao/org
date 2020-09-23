@@ -1,5 +1,5 @@
 #+TITLE: React
-🔴
+🔴 
 
 * pnpm + Vite + urql
 
@@ -393,13 +393,42 @@ class List extends React.Component{
 #+END_SRC
 ** 受控组件 非受控组件
 就看是否 自动维护 value 到 state， 维护到 state 的就是受控组件
-** 生命周期函数(钩子)
-+ 挂载 componemntDidMount()  
+** 生命周期函数(钩子)(旧的)
++ 🟢 挂载 componentDidMount()  
   开定时器， 发 ajax 请求
-+ 更新 
-+ 卸载 componentWillUnmount()
++ 🟢 卸载 componentWillUnmount()
   做一些收尾性的工作 
++ componentWillReceiveProps()    从第二次开始算(父组件更新状态的时候)
++ forceUpdate()   强制更新
++ shouldComponentUpdate()  
++ 更新 componentWillUPdate()
 *** 流程
 componentWillMount()   ->   render()  -> componentDidMount()
 componentWillUpdate()  ->   render()  -> componentDidUpdate()
+*** 将要废弃的钩子
+一共 4 个 will 废弃了 3 个， 剩一下 componentWillUnmount
++ componentWillMount()
++ componentWillReceiveProps()
++ componentWillUpdate()
+***  新流程
+**** getDerivedStateFromProps
++ 🔴 getDerivedStateFromProps
+  + should be a static method
+  + must have return, null or object, return 的对象会对 state 做更新, 没重名追加，有重名更新
+  + 用于取代 willMount, willUpdate
+#+BEGIN_SRC js react 
+static getDerivedStateFromProps(props, state){
+    return {a: 1}
+}
+#+END_SRC
+**** getsnapshotbeforeupdate
+
+**** 挂载时
+constructor -> getDerivedStateFromProps -> render -> componentDidMount
+**** 更新时
+getDerivedStateFromProps -> shouldComponentUpdate -> render -> getsnapshotbeforeupdate -> componentDidUpdate
+**** 卸载时
+componentWillUnmount
+** react 中的 key
+
 
