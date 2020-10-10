@@ -12,6 +12,13 @@ pnpm init vite-app gh-explorer --template react
 cd gh-explorer
 pnpm i
 pnpm dev
+*** 编译
+pnpm build
+🔴 dist 里面的不能直接访问，因为[[https://stackoverflow.com/questions/46992463/es6-module-support-in-chrome-62-chrome-canary-64-does-not-work-locally-cors-er?rq=1][跨域]]，如果想访问 编译好的文件，可以在 dist 里起一个服务服务
+python3 -m http.server 8001
+** nginx 配置
+[[https://zhuanlan.zhihu.com/p/103244419][链接]]
+
 * ES6 模块化
 + 暴露：
   + 分别暴露，统一暴露
@@ -67,12 +74,13 @@ pnpm dev
   1. import {} from './xx/xx'
   2. import a from './xxx/xx'
 
-   
+     
 * jsx 
 ** 语法规则
 + className
 + {}  里面写 js
  ⚠️注意：{} 里面只能写表达式，言外之意 function 或者 箭头函数
+ 
  一个表达式 会产生一个值
 + 最外层 只能包含一个 标签，（最后外面套一个 div 一般）
 + 组件 标签首字母大写
@@ -112,7 +120,15 @@ class Myconponent2 extends React.Component {
 #+END_SRC
 ** 组件三大属性
 *** state
-特点 state 就叫 state， 1.不能直接更新， 2.不能直接修改， （借助 setState 方法）
+特点 state 就叫 state，
+
++ 1.不能直接修改， （借助 setState 方法）
+  
++ 2.不能直接更新，
+  直接 =  赋值 这种 指向同一个堆，在用这个变量更新的时候 相当于是直接更新了，所以不行
+
+  需要 new_data = [...this.state.data]  这种 解构一个 list 又赋值 相当于 new 了一个新的 内存空间， 就可以
+
 Component 里面 自己定义的方法 拿不到 this 需要 bind this （react 底层弊端， vue 没这个问题）
 #+BEGIN_SRC js react
 
@@ -171,6 +187,7 @@ class Weather extends React.Component {
 #+END_SRC
 *** props
 翻译过来 参数的意思
+
 其实就是 jsx 中 的组件在调用并传值的时候 class 内部可以访问到这部分值的一种防方式
 #+BEGIN_SRC js react
 import PropTypes from 'prop-types';
@@ -248,7 +265,9 @@ let person2 = {name:"sb", age:18, sex:"女"}
 #+END_SRC
 *** ref
 ref 和 refs 就是类似 id 一样给标签做标记，方便找到
+
 ref 标记， this.refs 拿到标记的标签
+
 🔴注意️：能不用就不用，event 有时候也可以
 #+BEGIN_SRC js react
 class MyComponent extends React.Component{
@@ -277,7 +296,9 @@ class MyComponent extends React.Component{
 **** ref 新写法(基于回调)
 
 原理：react 会调用 ref， 并把当前节点 传入给 ref 表达式, 然后手动指定变量 赋值给当前节点
+
 <input type="text" ref={ (input) => {this.input1 = input} }/>&nbsp;
+
 <input type="text" ref={ input => this.input1 = input }/>&nbsp;
 
 #+BEGIN_SRC js react
@@ -404,6 +425,7 @@ class List extends React.Component{
 + 更新 componentWillUPdate()
 *** 流程
 componentWillMount()   ->   render()  -> componentDidMount()
+
 componentWillUpdate()  ->   render()  -> componentDidUpdate()
 *** 将要废弃的钩子
 一共 4 个 will 废弃了 3 个， 剩一下 componentWillUnmount
@@ -421,6 +443,9 @@ static getDerivedStateFromProps(props, state){
     return {a: 1}
 }
 #+END_SRC
+
+#+RESULTS:
+
 **** getsnapshotbeforeupdate
 
 **** 挂载时
@@ -430,5 +455,179 @@ getDerivedStateFromProps -> shouldComponentUpdate -> render -> getsnapshotbefore
 **** 卸载时
 componentWillUnmount
 ** react 中的 key
+不能用 index， 因为每次属组变化 index 都会重新赋值，所以会变，可能造成对应错误
 
+** 组件的通信方式
+*** 通过 props 通信
+*** 消息订阅，消息发布 PubSub-js
+好处： 方便
+
+缺点： 乱(不是集中式管理)
+
+* 发送请求
+** axios
+1. 轻量
+2. promise 风格
+** fetch
+1. 浏览器原生支持, 其他的都需要引入(随 H5 集成的)
+2. 只有他符合【关注分离】
+   1. 联系服务器
+   2. 携带回来的服务器数据 
+   3. (表面上很好)
+
+* react-router 
+[[https://react-router.docschina.org/web/api/NavLink][文档]]
+** 一般组件 路由组件
+*** 一般组件
+自己写标签渲染的
+*** 路由组件
+路由帮助我们渲染的
+1. 点击切换效果
+2. html 选项卡位置,  ----> Link  / NavLink
+3. 切换内容的位置  ----> 抽离成组件
+4. 引入组件 用 Route 
+*** （重点）路由组件和一般组件的区别
+路由组件 props 多很多东西
++ history
+  - goBack
+  - goForward
+  - push
+  - replace
++ location
+  - pathname
++ match 
+  - params
+**** 路由组件传值
+#+BEGIN_SRC js
+<Link to={ `/home/message/detail/${item.id}` }>{ item.title }</Link>
+    
+<Route path="/home/message/detail/:id" component={ HomeMessageDetail }/>
+#+END_SRC
+
+** Route 模糊匹配
+** Switch  匹配到就停停止匹配，效率高
+** NavLink 相比 Link 可以帮助点亮选中
+*** replace
+如果为 true 则不产生 页面历史记录，即可以被浏览器回退
+
+** BrowserRouter 包在最外面
+** HashRouter
+url 多了一个#， # 后面的都和服务端没关系了（都是前端路由）
+** Redirect 兜底 Router
+** 代码
+#+BEGIN_SRC js react
+import React, { Component } from 'react';
+import { BrowserRouter, NavLink, Redirect, Route, Switch } from 'react-router-dom';
+import './App.css';
+import About from './pages/about';
+import Home from './pages/home';
+
+export default class App extends Component {
+
+    render() {
+
+        return (
+            <BrowserRouter>
+            <div>
+              <div className="row">
+                <div className="col-xs-offset-2 col-xs-8">
+                  <div className="page-header"><h2>React Router Demo</h2></div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-xs-offset-2 col-xs-2">
+                    <NavLink className="list-group-item" activeClassName="demo" href="./about.html" to="/about">about</NavLink>
+                    <NavLink className="list-group-item" activeClassName="demo" href="./home.html" to="/home">Home</NavLink>
+                </div>
+                <div className="col-xs-6">
+                  <div className="panel">
+                    <div className="panel-body">
+                      <Switch>  {/*加了switch 性能好*/}
+                        <Route path="/about" component={ About } exact/> { /* exact 轻易不要加, 和 link 对应不上会显示有问题 */ }
+                        <Route path="/home" component={ Home }/>
+                        <Redirect to="/about"/> { /*都匹配不上走这个*/ }
+                      </Switch>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </BrowserRouter>
+        )
+    }
+}
+
+#+END_SRC
+** 多级路由
+*** 一级路由
+*** 二级路由
+url 比一级多一层
+*** 嵌套路由
+** 编程式路由导航
+利用 路由组件 的 props 里面 history
+#+BEGIN_SRC js
+// 手动指定 路由到某个 route
+this.props.history.push(`/home/message/detail/${id}`)
+#+END_SRC
+* redux
+** 图
+#+ATTR_ORG: :width 600px
+[[https://tva1.sinaimg.cn/large/007S8ZIlgy1gjhssebhxoj31h10u0tml.jpg]]
+** redux 三个核心概念
+*** action
+**** 标示要执行行为的对象
+**** 2 个属性
++ type：
++ xxx: 数据属性
+*** reducer
+**** 根据老的 state 和 action， 产生新的 state 的纯函数
+*** store
+**** getState()
+**** dispatch()
+**** subscribe()
+** react-redux
+为了简化 react 使用 redux
+*** react-redux 将所有组件分为 2 大类
+**** UI 组件
+***** 只负责 UI 的呈现，不带有任何业务逻辑
+***** 通过 props 接收数据
+***** 不使用任何 redux 的 api
+***** 一般保存在 component 文件夹下
+**** 容器组件
+***** 负责管理数据和业务逻辑，不负责 UI 的呈现
+*** 本质
++ 每个组件 最外层套了一个 container ，来管理 state，和 dispatch, 所以 有了 mapStateToProps, 和 mapDispatchToProps 这两个方法（本质上是 父组件给子组件传参） 
++ 中间人 container 需要使 store 和 component 联系起来，所以需要 connect 方法 
+  connect(mapStateToProps, mapDispatchToProps)(Component)
++ root 节点需要 Provider 提供根 store 数据
+*** 代码（精简版）
+#+BEGIN_SRC js
+export default connect(
+    state => ({ count: state }),
+    {
+        inCrement: createIcrementAction,
+    }
+)(Counter)
+
+
+#+END_SRC
+** redux-thunk
+异步中间件
+发异步请求代码写在 action_creator 里面
+** chrom redux 调试工具
+pnpm add redux-devtools-extension
+
+* tips
+** 阻止 form 提交
+e.preventDefault()
+** splice 用法
+splice(<index>, 0/1, ...items)
+0 add
+1 替换， 替换成空 就是删除
+🔴 这种方法会改变原数组
+
+** 路由里面 多个/ 导致 css 样式丢失
+  1. <link rel="stylesheet" href="%PUBLIC_URL%/public/css/bootstrap.css">
+  2. .去掉
+  3. 用 HashRouter
 

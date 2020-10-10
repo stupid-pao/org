@@ -1,0 +1,22 @@
+#+TITLE: Org
+
+C-c C-c 执行 src 里面的代码
+
++sdlkfjsdlk+
+
+_slkdjf_
+
+* 显示图片
+1. 用 [[]]  里面放图片链接
+2. #+ATTR_ORG: :width 600px
+   通过这个控制图片大小
+3. z i 使链接显示图片
+   #+BEGIN_SRC
+    #+ATTR_foo: :width 600px
+    [[file:Desktop/foo.png]]
+
+   #+END_SRC
+   
+** 例子
+#+ATTR_foo: :width 600px
+[[/Users/paozi/Library/Application Support/typora-user-images/image-20201008120221842.png]]

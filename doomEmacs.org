@@ -1,0 +1,29 @@
+#+TITLE: Doom Emacs
+
+* snippets
+** 新建
+M-x snippets/new
+新加的 snippets 会在 .doom 文件加里面， 当前的 model 里面，创建 snippet 片段
+** 重写，覆盖
+doom-snippets 里面有很多已经写好的模块，如果想覆盖，新建的 key 相同的情况下，覆盖 doom-snippets 的 uuid
+
+* .dir-locals.el
+用命令生成的， 最好不好自己写
+
+在你想要的 project 目录下，
+
+M-x add-dir-local-variable  然后一级一级选，然后写入变量
+
+* profile 性能测试
+profile-start 开启测试 然后运行卡的地方
+
+profile-report  查看 cup / meu report
+* mode
+** So Long mode
+emacs 遇到超长的行之后会卡，所以有个 so long 的模式，检测到超长的行之后会关掉一些特性避免卡
+** lsp ui doc mode
+shift + k  显示 function 信息
+** undo tree
+*** undo-tree-visualize
+**** C-x u
+

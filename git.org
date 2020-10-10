@@ -292,3 +292,5 @@ git rebase 使用最好指定 当前分支和 要合并过来的分支， 因为
 
 使用：
 git rebase <current_branch> <need rebase branch>
+* git ignore have cach
+git rm -r --cached .

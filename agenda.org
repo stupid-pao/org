@@ -1,0 +1,25 @@
+#+TITLE: Agenda
+
+ 
+* Agenda command
+** TODO learn agenda
+SCHEDULED: <2020-09-28 Mon 13:00>
++ SPC-m-t-t to mark as "todo"
++ SPC-m-d-s opens the org-schedule.
+  - shift + ARROW to change date
+  - input a time RET to create a schedule
+  - Click on the date in the calendar
++ In normal mode, RET toggles TODO and DONE.
+  
+** TODO Review lists and checkboxes in org mode [1/5]
+SCHEDULED: <2020-09-28 Mon 09:27>
+- [ ] CTRL-RET adds a new list items at the same level. 
+- [X] C-c C-c to change checkboxes status. or SPC-m-x
+- [ ] add a "["/"]" on TODO line, will have numbers auto
+- [ ] scheduel params
+  - [ ] add '++1d' in <2020-10-05 Mon 18:00 ++1d> means do this schecule every day
+  - [ ] <2020-09-28 Mon 18:00>--<2020-09-29 Tue 18:00>
+- [ ] text checkbox 
+  - [ ] sublist item 1
+  - [ ] sublist item 2
+  - [ ] sublist item 3

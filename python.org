@@ -1,0 +1,13 @@
+#+TITLE: Python
+
+
+* django
+** app
+*** Simple JWT
+*** restframwork
+*** django_extensions
+**** [[https://django-extensions-zh.readthedocs.io/zh_CN/latest/][文档]]
+**** runservre_plus
+**** shell_plus
+***** pip install ptpython
+

@@ -75,6 +75,16 @@ func main() {
 29
 #+end_example
 
+* go errors 处理记录
+** lsp gopls 报错
+原因： gopls 版本不对
+
+[[https://github.com/golang/tools/blob/master/gopls/doc/user.md#installation][installation]]
+官方要求安装命令：
+#+BEGIN_SRC bash
+go get golang.org/x/tools/gopls@latest
+# Do not use the -u flag, as it will update your dependencies to incompatible versions.
+#+END_SRC
 * 标准库
 ** os 包
 #+BEGIN_SRC go
@@ -200,3 +210,59 @@ func main() {
 然后可以重载这个接口中的方法（一种使用目的）
 或者是用作对这个接口做一些约束（另一种用法）
    
+* 指针
+** 逃逸
+一旦将某个局部变量以指针的方式传出，该变量就会逃逸到堆
+* interface 
+interface 也是一个结构，如果符合 duck type 则可以做转换
+
+转化过程需要注意，转化过程中接收到到是指针 可以看到这个 对象的所有方法，但是如果不是指针，在这个 interface 的角度只能看到这个对象的非指针方法（方法的参数是值传递的）
+
+* 区别
+** new & make 的区别
+new(T) 返回的是 T 的指针
+
+make 只能用于 map， slice， channel
+
+make(T, args) 返回的是引用类型，在函数内部可以直接更改原始值，对 map 和 channel 也是如此。
+
+以下几种 struct 的初始化方式，很少用到 new
+#+BEGIN_SRC go
+type Foo struct {
+    name string
+    age  int
+}
+
+//声明初始化
+var foo1 Foo
+fmt.Printf("foo1 --> %#v\n ", foo1) //main.Foo{age:0, name:""}
+foo1.age = 1
+fmt.Println(foo1.age)
+
+//struct literal 初始化
+foo2 := Foo{}
+fmt.Printf("foo2 --> %#v\n ", foo2) //main.Foo{age:0, name:""}
+foo2.age = 2
+fmt.Println(foo2.age)
+
+//指针初始化
+foo3 := &Foo{}
+fmt.Printf("foo3 --> %#v\n ", foo3) //&main.Foo{age:0, name:""}
+foo3.age = 3
+fmt.Println(foo3.age)
+
+//new 初始化
+foo4 := new(Foo)
+fmt.Printf("foo4 --> %#v\n ", foo4) //&main.Foo{age:0, name:""}
+foo4.age = 4
+fmt.Println(foo4.age)
+
+//声明指针并用 new 初始化
+var foo5 *Foo = new(Foo)
+fmt.Printf("foo5 --> %#v\n ", foo5) //&main.Foo{age:0, name:""}
+foo5.age = 5
+fmt.Println(foo5.age)
+
+#+END_SRC
+** [[https://learnku.com/articles/23411/the-difference-between-rune-and-byte-of-go][[]rune 和 []byte 的区别]]
+

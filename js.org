@@ -120,4 +120,13 @@ console.log(obj2)
 : true
 : { '123': 456, gender: 18 }
 : { name: 'qian', age: 28, gender: 'male' }
+* 浏览器 原生 function
++ 当前页面重定向
+    location.href = url;
++ 导出文件
+  - 新开页面
+    window.open(url);
+  - 当前页面下载
+    window.location = url;
+
 

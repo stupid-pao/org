@@ -1,0 +1,43 @@
+#+TITLE: Jquery
+
+
+
+* snippets
+select 选中某一个选项 下方多一个 input 输入
+#+BEGIN_SRC html
+
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label for="id-medical-conditions-select">{% trans "Medical conditions/allergie" %}:</label>
+        <select class="form-control" name="medical_conditions" id="id-medical-conditions-select">
+            <option>No</option>
+            <option data="1">Yes</option>
+        </select>
+    </div>
+    <div class="form-group col-md-6 js-medical-conditions-yes" hidden>
+        <label for="id-medical-conditions-detail">&nbsp;</label>
+        <input name="medical_conditions_yes" type="text" class="form-control" id="id-medical-conditions-detail" placeholder="please specify if ‘yes’">
+    </div>
+</div>
+
+#+END_SRC
+#+BEGIN_SRC js jquery
+
+let _select_medical_conditions = function() {
+    var current_option = $(this).children("option:selected").attr("data")
+    if (current_option == "1") {
+    $(DOM.js_medical_conditions_yes).removeAttr('hidden')
+    } else {
+    $(DOM.js_medical_conditions_yes).attr("hidden", true)
+    $(DOM.js_medical_conditions_yes).find("#id-medical-conditions-detail").val("");
+    }
+};
+
+var eventMap = {
+    select_medical_conditions: function() {
+    $(DOM.id_medical_conditions_select).on("change", _select_medical_conditions);
+    },
+}
+
+#+END_SRC
+    

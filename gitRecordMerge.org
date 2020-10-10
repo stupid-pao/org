@@ -166,6 +166,29 @@ from django.core.urlresolvers import reverse
 
 url = reverse('kiple:kiple-callback')
 
+** utc time convert to local time
+[[https://stackoverflow.com/questions/4770297/convert-utc-datetime-string-to-local-datetime][link]]
+#+BEGIN_SRC python
+from dateutil import tz
+
+# METHOD 1: Hardcode zones:
+from_zone = tz.gettz('UTC')
+to_zone = tz.gettz('Asia/Singapore')
+
+# METHOD 2: Auto-detect zones:
+from_zone = tz.tzutc()
+to_zone = tz.tzlocal()
+
+# utc = datetime.utcnow()
+utc = datetime.strptime('2020-9-18 23:40', '%Y-%m-%d %H:%M')
+
+# some datetime => to utc time
+ utc = datetime.now().astimezone(from_zone)
+
+# utc datetime => target datetime
+central = utc.astimezone(to_zone)
+
+#+END_SRC
 
 ** Taidii code
 *** convert pic to pdf api
@@ -657,4 +680,45 @@ diilight student list 列表 显示不一致
 
 ** hotfix/attendance_export_1608
 ** imp/sale_list_1581
+** feature/sendEmail_1619
+SettingEmailConnection
+** imp/myob_1768  dev:✅
+** imp/giro_export_1773   dev:✅
+从 excel 中导入数据
+Add a Mandate ID column in the excel file for import [Nascans]  
+/finance/settings/nascan-giro/import     finance.views_settings.ImportNascanGiroView
+ImportNascanGiroView
+** imp/addPermission_1574   dev:✅
+Give access right for staff account to create event types [Nascans]
+*** permission:
+eventcalendar:update
+description: calendar event type update/edit/delete	
+** imp/Rename_finance_1576   dev:✅
+** imp/accident_record_1586
+Accident Record 优化 [ASH]
+"Responsible" 改成 "Teacher in-charge"
+Accident Type 加入新选项 "Others"，选择后允许用户自己填写内容。
+缺少 “Class” 字段。虽然是选择了班级后再添加记录，但无论是网页端还是导出版，表格中都没有体现出班级。
+Student Attendance - All - Accident Record 页面中也应添加一个 Export 按钮，到处全校所有班级的记录。并允许选择起止月份。
+
+student_accident_report
+#+BEGIN_SRC python
+
+current_year = center.get_academic_year_for_date(today)
+from courseact.rest.helper import get_class_for_center
+#+END_SRC
+
+** imp/finance_export_template_1536
+** aging_report_1585
+/reports/finance/outstanding/xls/?report=true&invoice=190868,209552
+** hotfix/resourceManagementStockIn_1802
+resourcemanagement/categorymanager/category_list.html
+*** url:
+hq stock out
+/hq/category/stock/out/    hq.views_resourcemanagement.CategoryStockOut
+** imp/withdrawnReport_1799
+** hotfix/receiptAmount_1570
+receipt total amount 必须填一个非零的才能提交
+finance/receipt_create.html
+
 
