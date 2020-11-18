@@ -1,0 +1,91 @@
+#+TITLE: Lisp
+
++ SPE - x   打开 scratch 
++ M-x lisp-interaction-mode
++ 光标到括号后面, C-j 执行  |  C-x C-e 会在底部显示
+ninill
+
+
+#+BEGIN_SRC lisp
+(+ 2 2)
+4
+
+
+(+ 2 (+ 1 1))
+4
+
+(+ 3 (+ 1 2))
+6
+
+(setq my-name "Bastien")
+(insert "Hello!" "world")
+(insert "Hello, i am " my-name)
+
+(defun hello () (insert "Hello, i am " my-name))
+(hello)
+
+(defun hello (name) (insert "Hello, i am " name))
+(hello "you")
+
+(switch-to-buffer-other-window "*test*")
+
+(progn
+        (switch-to-buffer-other-window "*test*")
+        (hello "you")
+  )
+
+(progn
+  (switch-to-buffer-other-window "*test*")
+  (erase-buffer)
+  (hello "there")
+  )
+
+(let ((local-name "you"))
+  (switch-to-buffer-other-window "*test*")
+  (erase-buffer)
+  (hello local-name)
+  (other-window 1)
+    )
+
+(format "Hello %s!\n" "visitor")
+
+(defun hello (name)
+  (insert (format "Hello %s!\n" name))
+  )
+(hello "you")
+
+(defun greeting (name)
+  (let ((you-name "Bastien"))
+    (insert (format "Hello %s!\n i am %s" name you-name))))
+
+ (greeting "you")
+
+(setq list-of-names ' ("xiao" "qian" "ttt"))
+(car list-of-names)
+(cdr list-of-names)
+
+(push "Stephanie" list-of-names)
+
+(mapcar 'hello list-of-names)
+
+(defun greeting ()
+  (switch-to-buffer-other-window "*test*")
+  (erase-buffer)
+  (mapcar 'hello list-of-names)
+  (other-window 1))
+(greeting)
+
+
+
+(defun replace-hello-by-bonjour ()
+  (switch-to-buffer-other-window "*test*")
+  (goto-char (point-min))
+  (while (search-forward "Hello")
+    (replace-match "Bonjour"))
+  (other-window 1))
+(replace-hello-by-bonjour)
+
+
+
+
+#+END_SRC

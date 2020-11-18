@@ -1,0 +1,33 @@
+#+TITLE: Ajax
+
+Sending multipart/formdata with jQuery.ajax
+
+#+BEGIN_SRC ajax
+    $("#nascans_enrolled_students_create").submit(function(event) {
+      event.preventDefault();
+      var form = $("#nascans_enrolled_students_create")
+      var formData = new FormData(document.getElementById("nascans_enrolled_students_create"))
+      $.ajax({
+        type: "POST",
+        url: form.attr('action'),
+        data: formData,
+        contentType: false,
+        processData: false,
+      }).done(function (data) {
+        console.log(data)
+        success = data.success
+        if (success==0) {
+          _nascan_child_error(data.err_msg)
+        } else {
+          console.log(data.next_url)
+          window.location.href=data.next_url
+        }
+      }).fail(function (data) {
+        _nascan_child_error("Oops! An error occured and your message could not be sent.")
+      })
+
+    });
+
+
+#+END_SRC
+

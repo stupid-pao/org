@@ -120,6 +120,19 @@ console.log(obj2)
 : true
 : { '123': 456, gender: 18 }
 : { name: 'qian', age: 28, gender: 'male' }
+** [[https://juejin.im/post/6844903614918459406#heading-7][js 数组详细操作]]
+** 遍历
+#+BEGIN_SRC js
+// for
+for (const item of items) {
+  console.log(item)
+}
+
+// forEach
+array.forEach(function(item){
+});
+
+#+END_SRC
 * 浏览器 原生 function
 + 当前页面重定向
     location.href = url;
@@ -129,4 +142,59 @@ console.log(obj2)
   - 当前页面下载
     window.location = url;
 
+* 实用 package
 
+** [[https://github.com/SheetJS/sheetjs][sheetjs]]
+js 操作 excel， 展示，生成
+* ES6 Promise 和 Async/await 的使用
+https://juejin.im/post/6844903539605504008#heading-7
+1
+2
+3
+4
+5
+6
+
+
+#+BEGIN_SRC js :results output
+
+function lacesarSignal() {
+    class Pizza {
+        constructor (yours) {
+            this.yours = yours;
+            this.sequence = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => Math.pow(2, n)).sort((a, b) => a > b ? -1 : (a<b) ? 1 : 0);
+            this.cipher = [];
+        }
+
+        getCipher() {
+            this.sequence.reduce( (total, piece) => {
+                if (total + piece > this.yours) return total;
+                this.cipher.push(piece);
+                return total += piece;
+            }, 0 )
+            this.cipher.sort((a, b) => a  > b ? 1 : (a < b) ? -1 : 0);
+            return this
+        }
+
+        decrypt(dictionary) {
+            return this.cipher.map((atom, idx) => dictionary[atom + this.keys[idx]]).join("");
+        }
+
+        getKeys() {
+            this.keys = [5, 1, 1, -92, -490]
+            return this;
+        }
+    }
+let dictionary = ["自", "由", "自", "在", "功", "不", "可", "没", "卓", "有",
+                "成", "效", "大", "吉", "大", "利", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+                "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+return new Pizza(666).getKeys().getCipher().decrypt(dictionary)
+}
+
+console.log(lacesarSignal())
+
+
+#+END_SRC
+
+#+RESULTS:
+: 没有 BUG

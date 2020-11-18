@@ -9,5 +9,8 @@
 **** [[https://django-extensions-zh.readthedocs.io/zh_CN/latest/][文档]]
 **** runservre_plus
 **** shell_plus
+***** pip install bpython
 ***** pip install ptpython
+** orm
+*** [[https://www.cnblogs.com/michael9/p/13797403.html][select_related & prefetch]]
 

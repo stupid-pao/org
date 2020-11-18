@@ -1,5 +1,5 @@
 #+TITLE: Git Record Merge
-🚀 🥎 🎾 🪀 🥏 🥊 🎯 🦠 🌈️
+🚀 🥎 🎾 🪀 🥏 🥊 🎯 🦠 🌈️  ✓
 * music 
 ** [[https://www.youtube.com/watch?v=zvkHSDO5VQ8][七里香]] 
 * 🌈️ code snipets
@@ -20,6 +20,9 @@ print(sys.version_info)
 : hello xiao
 : 2020-05-01 11:28:47.270706
 : sys.version_info(major=3, minor=7, micro=7, releaselevel='final', serial=0)
+** postman csrftoken
+header 设置
+X-CSRFToken
 
 ** upload picture use base64
 #+BEGIN_SRC python
@@ -691,8 +694,10 @@ ImportNascanGiroView
 ** imp/addPermission_1574   dev:✅
 Give access right for staff account to create event types [Nascans]
 *** permission:
-eventcalendar:update
++eventcalendar:update+  
+calendar_event:create_event_type
 description: calendar event type update/edit/delete	
+
 ** imp/Rename_finance_1576   dev:✅
 ** imp/accident_record_1586
 Accident Record 优化 [ASH]
@@ -721,4 +726,82 @@ hq stock out
 receipt total amount 必须填一个非零的才能提交
 finance/receipt_create.html
 
+** feature/hq_jsreport_excel_1549
+纯 js 操作 excel
+*** 必要条件
+<script lang="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.8/xlsx.core.min.js"></script>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+hq/finance/center_royalty_report.html
+
+*** permission
+Finance:hq-advance-payment-report
+*** tips
+sheetjs 操作 excel
+**** 资料
+
+***** sheetjs
+****** [[https://www.cnblogs.com/liuxianan/p/js-excel.html#%E8%87%AA%E5%B7%B1%E6%89%8B%E5%86%99%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90][小茗同学]]
+****** [[https://github.com/SheetJS/sheetjs#installation][github]]
+****** https://www.yuque.com/siri/occp17/cin6tg
+***** XMLHttpRequest
+****** [[https://stackoverflow.com/questions/48969495/in-javascript-how-do-i-should-i-use-async-await-with-xmlhttprequest][async/await with XMLHttpRequest]]
+** imp/outstanding_1828
+** imp/sale_1803
+1803 1804 1800
+** hotfix/grading_exam_1834
+*** urls:
+ExamGradeViewSet
+show_grade
+** imp/myob_1827
+** feature/kidz_myob_1826
+** feature/reply_slip_1389
++ permission
+  enrolment:nascans_enquiry
+  - finance:nascans_payment_settings
+nascans enrollment form 流程
+*** TODO enquiry 流程 [3/3]
+- [X] 外链接填写表单 
+- [X] detail 展示填写信息
+- [X] email parent the online registration form with fixed information
+*** TODO registration 流程 [4/5]
+- [X] 必填项 红色
+- [X] 可以上传头像图片
+- [X] 几个字段的增加修改;加一个 link
+- [X] 新加 2 个 page 页面 在付钱之后
+  + [X] payment agrement
+  + [X] medical declaration
+- [ ] 二维码支付
+*** 要点记录
++ 一旦 用了 registration ， enquirer 里面就应该看不到了
+*** url 记录
+**** 第一个 url
+	enrollment.views_enroll.NascansCreateStudentAjaxView
+**** 第二个 url parents particular
++ 页面：
+    enrollment.views_enroll.NascansEnrollmentParentView
++ ajax:
+  enrollment:nascans-create-adult    NascansCreateAdultAjaxView
+*** file record
+**** enquire html
+enquiry/create_nascans_public.html
+*** TODO 潜在的问题
+- [ ] ic 重复的问题， 只有后三位，转成 student 会有 ic 重复的问题
+- [ ] registration student form level 字段更新问题
+*** ocpc paynow
+**** generate qrcode
+generate_ocbc_paynow_qr
+**** handle payment
+ocbcpaynow.rest.views.ocbc_paynow_credits_notification
+**** TODO 入学学生接口 可能要改
+
+** hotfix/advancePaymentUpdate
+不确定原因
+** imp/physicalTest 
+ 新的 rest api 体测翻译
+*** po 文件修改， 还需要做的 编译文件
+** imp/nascans_registration
+*** DONE whatapp registration link
+** TODO myob
+** feature/nascans_export_1945
+**  TODO hotfix/ns_registration_form
 

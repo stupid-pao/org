@@ -4,3 +4,31 @@
 + represent
 + identical
 + subtle
++ concrete
++ decoupe
++ contracts
++ implicit
+  implicit interface conversion
++ promotion
+  because of inner type promotion
++ guarantee
+  we have guarantee that ...
++ pollution
+  interface pollution
++ perspective
+  from our perspective
++ associated
++ parallel
++ coordinate
+  we have to coordinate these Goroutines to behave in a predictable or responsible manner.
++ orchestration
++ instruction
+  Atomic instruction are the fasted to go because deep down in memory
++ performance
+  Buffered channel ares not for performance.
++ perform
+  it performs a send
++ reliable
+  that's how we build systems that are reliable
++ bother
+  im sorry to bother you at this hour.

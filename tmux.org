@@ -1,0 +1,16 @@
+#+TITLE: Tmux
+
+* item2
+** tmux -CC
+** tmux -CC attach
+* 快捷键
+** command
+tmux ls
+tmux kill...
+tmux rename-session -t <session-name> <new-name>
+
+# 列出所有快捷键，及其对应的 Tmux 命令
+$ tmux list-keys
+
+# 列出所有 Tmux 命令及其参数
+$ tmux list-commands

@@ -1,0 +1,19 @@
+#+TITLE: Mac
+
+
+* 系统功能
+** 录屏功能
+cmd + shift + 5  开始
+-> record 录
+-> command + control + esc 停止
+* terminal 命令
+** find 删除
+#+begin_src shell
+find -type f -name "*.pyc" -delete
+#+end_src
+** 第三方 app 打不开，显示 remove to trash
+#+begin_src bash
+sudo spctl --master-disable
+sudo xattr -rd com.apple.quarantine /Applications/"$app_bashname"
+#+end_src
+

@@ -1,5 +1,19 @@
 #+TITLE: Doom Emacs
 
+* 切换 emacs-plus & emacs-mac
+#+begin_src bash
+ln -s /usr/local/opt/emacs-plus@27/Emacs.app /Applications
+ln -s /usr/local/opt/emacs-mac/Emacs.app /Applications/Emacs.app
+
+rm -rf /usr/local/bin/emacs
+sudo ln -s /Applications/Emacs.app/Contents/MacOS/Emacs /usr/local/bin/emacs
+
+rm -rf .emacs.d/.local
+# 也可以不用编译，目前 .emacs.d.cp  是emacs-plus 
+doom build
+
+#+end_src
+
 * snippets
 ** 新建
 M-x snippets/new
@@ -26,4 +40,7 @@ shift + k  显示 function 信息
 ** undo tree
 *** undo-tree-visualize
 **** C-x u
+** git-gutter-mode
+
+** diff-hl-model
 
